@@ -51,7 +51,7 @@ tags:
 
 > ⚠️ **命名规范**：所有 skill 必须以 `-skill` 结尾
 >
-> **platforms 默认值**：留空则生成全部平台（claude / codex / openclaw / hermes / cursor / windsruf）
+> **platforms 默认值**：留空则生成全部平台（claude / codex / openclaw / hermes / cursor / windsurf）
 
 ### 第二步：初始化仓库
 
@@ -91,7 +91,7 @@ tags:
 
 ```bash
 # 默认全平台，也可指定 PLATFORMS="claude codex openclaw"
-PLATFORMS=${PLATFORMS:-"claude codex openclaw hermes cursor windsruf"}
+PLATFORMS=${PLATFORMS:-"claude codex openclaw hermes cursor windsurf"}
 
 for platform in $PLATFORMS; do
   case $platform in
@@ -155,7 +155,7 @@ EOF
 {content}
 EOF
       ;;
-    windsruf)
+    windsurf)
       cat > WINDSURF.md << 'EOF'
 # {name}
 
@@ -206,9 +206,9 @@ cat > .codex-plugin/plugin.json << 'EOF'
 }
 EOF
 
-# .cursor-plugin/plugin.json
-mkdir -p .cursor-plugin
-cat > .cursor-plugin/plugin.json << 'EOF'
+# .opencode/plugins/{name}.json
+mkdir -p .opencode/plugins
+cat > .opencode/plugins/{name}.json << 'EOF'
 {
   "name": "{name}",
   "version": "1.0.0",
@@ -366,7 +366,7 @@ tags:
 SKILLEOF
 
 # 生成全部平台入口
-for platform in claude codex openclaw hermes cursor windsruf; do
+for platform in claude codex openclaw hermes cursor windsurf; do
   case $platform in
     claude)
       cat > CLAUDE.md << 'EOF'
@@ -432,7 +432,7 @@ EOF
 <!-- 用户补充 -->
 EOF
       ;;
-    windsruf)
+    windsurf)
       cat > WINDSURF.md << 'EOF'
 # {NAME}
 
@@ -503,8 +503,6 @@ git push -u origin main
 ├── .claude-plugin/       # Claude Code 插件元数据
 │   └── plugin.json
 ├── .codex-plugin/        # Codex 插件元数据
-│   └── plugin.json
-├── .cursor-plugin/       # Cursor 插件元数据
 │   └── plugin.json
 └── .opencode/           # OpenCode 插件目录
     └── plugins/
