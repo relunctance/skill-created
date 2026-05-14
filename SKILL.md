@@ -38,12 +38,14 @@ tags:
 
 | 字段 | 说明 | 示例 |
 |------|------|------|
-| `name` | skill 名称（英文，kebab-case） | `ubuntu-chromium-setup` |
+| `name` | skill 名称（英文，kebab-case，**必须以 `-skill` 结尾**） | `ubuntu-chromium-setup-skill` |
 | `description` | 一句话描述（中文） | `Ubuntu/WSL Chromium 安装 + 中文字体配置` |
 | `triggers` | 触发关键词列表（中文） | `ubuntu 安装 chrome`, `中文乱码` |
 | `category` | 分类 | `devops` / `data-science` / `productivity` 等 |
 | `author` | 作者 | `relunctance` |
 | `content` | skill 正文内容 | 用户提供的正文 |
+
+> ⚠️ **命名规范**：所有 skill 名称必须以 `-skill` 结尾，如 `dir-skill`、`honesty-skill`
 
 ### 第二步：初始化仓库
 
@@ -189,11 +191,11 @@ git push origin main
 ## 完整执行示例
 
 ```bash
-# 用户提供：name=ubuntu-chromium-setup, description=Ubuntu Chromium安装+字体配置
-# triggers=[ubuntu chrome安装, 中文乱码, fontconfig]
+# 用户提供：name=ubuntu-chromium-setup-skill, description=Ubuntu Chromium安装+字体配置
+# triggers=[ubuntu 安装 chrome, 中文乱码, fontconfig]
 # category=devops, author=relunctance
 
-NAME=ubuntu-chromium-setup
+NAME=ubuntu-chromium-setup-skill
 DESC="Ubuntu/WSL Chromium 安装 + 中文字体配置"
 TRIGGERS="ubuntu chrome安装|中文乱码|fontconfig|小红书乱码"
 CATEGORY=devops
