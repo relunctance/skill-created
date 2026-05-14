@@ -118,6 +118,63 @@ git remote add origin https://github.com/{author}/{name}.git
 git push -u origin main
 ```
 
+### 第七步：联动更新 gql-skills
+
+```bash
+# 克隆 gql-skills（如已有可跳过）
+GQL_SKILLS=~/repos/gql-skills
+[ ! -d "$GQL_SKILLS" ] && git clone https://github.com/relunctance/gql-skills.git "$GQL_SKILLS"
+cd "$GQL_SKILLS"
+
+# 读取新 skill 信息
+NEW_NAME={name}
+NEW_DESC={description}
+NEW_CATEGORY={category}
+AUTHOR={author}
+
+# 构造表格行（按分类追加到对应表格）
+ROW="| $NEW_NAME | 🏠内部 | $NEW_DESC | [repo](https://github.com/$AUTHOR/$NEW_NAME) · [SKILL.md](https://github.com/$AUTHOR/$NEW_NAME/blob/main/SKILL.md) |"
+
+case "$NEW_CATEGORY" in
+  Infrastructure)  TARGET="### Infrastructure" ;;
+  DevOps|Devops)   TARGET="### DevOps" ;;
+  AI/ML|AI|ML)    TARGET="### AI 与机器学习" ;;
+  Productivity)    TARGET="### Productivity" ;;
+  *)               TARGET="### Experimental" ;;
+esac
+
+awk -v target="$TARGET" -v row="$ROW" '
+  BEGIN { in_section=0 }
+  $0 == target { in_section=1; print; next }
+  in_section && /^### / { in_section=0 }
+  in_section && /^\| Skill/ { print; next }
+  in_section && /^\|---/ { capturing=1; print; next }
+  in_section && capturing && /^\|/ { print row; capturing=0 }
+  { print }
+' README.md > README.md.tmp && mv README.md.tmp README.md
+
+awk -v target="$TARGET" -v row="$ROW" '
+  BEGIN { in_section=0 }
+  $0 == target { in_section=1; print; next }
+  in_section && /^### / { in_section=0 }
+  in_section && /^\| Skill/ { print; next }
+  in_section && /^\|---/ { capturing=1; print; next }
+  in_section && capturing && /^\|/ { print row; capturing=0 }
+  { print }
+' SKILL.md > SKILL.md.tmp && mv SKILL.md.tmp SKILL.md
+
+TODAY=$(date +%Y-%m-%d)
+CHANGELOG_ROW="| $TODAY | 添加 | $NEW_NAME 🏠内部 | 新建 skill |"
+sed -i "2a\\$CHANGELOG_ROW" README.md
+sed -i "2a\\$CHANGELOG_ROW" SKILL.md
+
+git add .
+git commit -m "feat: 添加 $NEW_NAME skill"
+git push origin main
+```
+
+> **注意**：如果新 skill 属于 `Expert Teams` 分类，手动在 README.md 和 SKILL.md 中对应表格追加，awk 脚本默认不处理该分类。
+
 ## 完整执行示例
 
 ```bash
