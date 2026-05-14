@@ -1,5 +1,5 @@
 ---
-name: skill-forge
+name: skill-created
 description: Skill 工厂 — 一键创建标准化 GitHub 公开仓库 + SKILL.md，适合需要快速沉淀大量 skill 的场景
 triggers:
   - 创建一个 skill
@@ -13,12 +13,12 @@ created: 2026-05-08
 updated: 2026-05-08
 tags:
   - skill
-  - skill-forge
+  - skill-created
   - boilerplate
   - github
 ---
 
-# skill-forge
+# skill-created
 
 > 一键创建标准化 skill GitHub 仓库，包含 SKILL.md + README.md
 
