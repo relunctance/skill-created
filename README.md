@@ -136,17 +136,17 @@ AUTHOR={author}
 ROW="| $NEW_NAME | 🏠内部 | $NEW_DESC | [repo](https://github.com/$AUTHOR/$NEW_NAME) · [SKILL.md](https://github.com/$AUTHOR/$NEW_NAME/blob/main/SKILL.md) |"
 
 case "$NEW_CATEGORY" in
-  Infrastructure)  TARGET="### Infrastructure" ;;
-  DevOps|Devops)   TARGET="### DevOps" ;;
-  AI/ML|AI|ML)    TARGET="### AI 与机器学习" ;;
-  Productivity)    TARGET="### Productivity" ;;
-  *)               TARGET="### Experimental" ;;
+  Infrastructure)  TARGET="## Infrastructure" ;;
+  DevOps|Devops)   TARGET="## 基础设施" ;;
+  AI/ML|AI|ML)    TARGET="## AI 与机器学习" ;;
+  Productivity)    TARGET="## 效率工具 Productivity" ;;
+  *)               TARGET="## 实验性" ;;
 esac
 
 awk -v target="$TARGET" -v row="$ROW" '
   BEGIN { in_section=0 }
   $0 == target { in_section=1; print; next }
-  in_section && /^### / { in_section=0 }
+  in_section && /^## / { in_section=0 }
   in_section && /^\| Skill/ { print; next }
   in_section && /^\|---/ { capturing=1; print; next }
   in_section && capturing && /^\|/ { print row; capturing=0 }
@@ -156,7 +156,7 @@ awk -v target="$TARGET" -v row="$ROW" '
 awk -v target="$TARGET" -v row="$ROW" '
   BEGIN { in_section=0 }
   $0 == target { in_section=1; print; next }
-  in_section && /^### / { in_section=0 }
+  in_section && /^## / { in_section=0 }
   in_section && /^\| Skill/ { print; next }
   in_section && /^\|---/ { capturing=1; print; next }
   in_section && capturing && /^\|/ { print row; capturing=0 }
