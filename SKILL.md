@@ -353,6 +353,25 @@ git commit -m "feat: 添加 $NEW_NAME skill"
 git push origin main
 ```
 
+### 第十步：README 检查与美化
+
+```bash
+# 必须包含的徽章：
+# - License (MIT)  →  ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+# - version        →  ![version](https://img.shields.io/badge/version-X.Y.Z-green.svg)
+# - platforms      →  ![platforms](https://img.shields.io/badge/platforms-claude%20%7C%20openclaw-blue.svg)
+# - category       →  ![category](https://img.shields.io/badge/category-{category}-blue.svg)
+
+# 必须包含的章节：
+# - ## 触发条件
+# - ## 安装
+# - ## 功能特性（或 ## 特性）
+```
+
+**注意**：这一步必须执行，不能跳过。README 美化是 skill 质量的基本要求。
+
+---
+
 ## 完整执行示例
 
 ```bash
