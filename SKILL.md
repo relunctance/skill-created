@@ -77,7 +77,7 @@ created: {YYYY-MM-DD}
 updated: {YYYY-MM-DD}
 platforms: all
 tags:
-{tag_lines}
+  - {name}
 ---
 
 # {name}
@@ -87,7 +87,40 @@ tags:
 {content}
 ```
 
-### 第四步：生成平台入口文件
+### 第三步半：创建 learns/ 目录
+
+```bash
+mkdir -p learns
+cat > learns/README.md << 'EOFLEARN'
+# {name} 踩坑沉淀
+
+> 开发/维护过程中遇到的所有坑，按标签归档。
+
+## 🏷️ 按标签索引
+
+<!-- 初次创建时为空，后续按需追加 -->
+
+---
+
+## 记录规范
+
+遇到新坑时，在对应标签下追加记录：
+
+```markdown
+### {一句话描述}
+
+**问题**：{具体现象}
+
+**原因**：{根本原因}
+
+**解决**：{解决方案}
+
+**相关 commit**：{commit hash} | **发现日期**：{YYYY-MM-DD}
+```
+EOFLEARN
+```
+
+
 
 ```bash
 # 默认全平台，也可指定 PLATFORMS="claude codex openclaw"
@@ -338,6 +371,36 @@ TODAY=$(date +%Y-%m-%d)
 mkdir -p ~/repos/$NAME
 cd ~/repos/$NAME
 
+# 创建 learns/ 目录
+mkdir -p learns
+cat > learns/README.md << 'EOFLEARN'
+# {NAME}
+
+> 开发/维护过程中遇到的所有坑，按标签归档。
+
+## 🏷️ 按标签索引
+
+<!-- 初次创建时为空，后续按需追加 -->
+
+---
+
+## 记录规范
+
+遇到新坑时，在对应标签下追加记录：
+
+```markdown
+### {一句话描述}
+
+**问题**：{具体现象}
+
+**原因**：{根本原因}
+
+**解决**：{解决方案}
+
+**相关 commit**：{commit hash} | **发现日期**：{YYYY-MM-DD}
+```
+EOFLEARN
+
 # 生成 SKILL.md
 cat > SKILL.md << 'SKILLEOF'
 ---
@@ -500,23 +563,22 @@ git push -u origin main
 ├── CODEX.md              # Codex 入口
 ├── CURSOR.md             # Cursor 入口
 ├── WINDSURF.md           # Windsurf 入口
+├── learns/               # 踩坑沉淀（按标签归档）
+│   └── README.md
 ├── .claude-plugin/       # Claude Code 插件元数据
 │   └── plugin.json
-├── .codex-plugin/        # Codex 插件元数据
+├── .codex-plugin/       # Codex 插件元数据
 │   └── plugin.json
 └── .opencode/           # OpenCode 插件目录
     └── plugins/
 ```
 
-## 踩坑记录
+## 踩坑沉淀
 
-| 坑 | 说明 | 解决方案 |
-|---|---|---|
-| GitHub API 创建仓库需要 token | 无 token 报 401 | `TOKEN=$(grep "oauth_token:" ~/.config/gh/hosts.yml | head -1 | awk '{print $2}')` |
-| git push 超时 | WSL/国内网络 | `git config --global http.proxy http://192.168.1.109:10808` |
-| SKILL.md frontmatter 格式错误 | YAML 解析失败 | 确保 `---` 独立一行，fields 缩进 4 空格 |
-| `date` 字段要用 YYYY-MM-DD | 其他格式不标准 | `date +%Y-%m-%d` |
-| skill 名称不以 `-skill` 结尾 | 规范不符 | 必须以 `-skill` 结尾 |
+> **历史踩坑记录已迁移到 `learns/` 目录**，按标签归档，持续更新。
+
+<!-- 以下为 skill-created 自身遇到的坑（供参考） -->
+<!-- 完整记录见 `learns/README.md` -->
 
 ## GitHub Token
 
