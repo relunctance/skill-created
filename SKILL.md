@@ -623,3 +623,62 @@ git push -u origin main
 TOKEN=$(grep "oauth_token:" ~/.config/gh/hosts.yml | head -1 | awk '{print $2}')
 curl -s -H "Authorization: token $TOKEN" https://api.github.com/user | jq .login
 ```
+
+---
+
+## 文档拆分原则（Skill 创作强制规范）
+
+> ⚠️ **所有 Skill 创作必须遵循**，也是所有 AGENTS.md 的通用原则。
+
+| 原则 | 说明 |
+|------|------|
+| **拆分到 references** | 详细文档拆分到 `references/` 目录，主文件只保留概要 |
+| **主文件简洁** | 角色.md / SKILL.md 主文件控制在 1000 行以内，只放核心流程和引用 |
+| **原子化** | 每个 reference 文件专注一个主题，便于单独更新 |
+| **引用完整性** | 拆分后必须同步更新主文件中的引用，确保不丢失 |
+
+### 违反案例
+
+一个 SKILL.md 写到 3000 行，所有内容堆在一起：
+- 更新某章节时必须全文浏览才能定位
+- 不同使用者关注点不同，但无法只读某章节
+- diff 满天飞，review 困难
+
+### 正确做法
+
+```
+skill-name/
+├── SKILL.md              # 主文件 ≤1000 行，核心流程 + references 索引
+├── README.md             # 入口文档
+├── learns/               # 踩坑沉淀
+│   └── README.md
+└── references/           # 详细文档（原子化，一个文件一个主题）
+    ├── API.md            # 精确 API paths、JSON structures、line numbers
+    ├── CONFIG.md         # 配置项详解
+    ├── TROUBLESHOOTING.md # 调试步骤
+    └── EXAMPLES.md       # 完整示例
+```
+
+### references/ 内容规范
+
+每个 reference 文件必须包含：
+- **精确路径**（文件路径 + 行号）
+- **具体命令**（带预期输出）
+- **JSON/配置结构**（完整可复制）
+- **验证清单**（可操作的 checklist）
+
+### 踩坑记录要求
+
+发现坑时立即记录到 `learns/`，不等待任务完成：
+
+```markdown
+### {一句话描述}
+
+**问题**：{具体现象}
+
+**原因**：{根本原因}
+
+**解决**：{解决方案}
+
+**相关 commit**：{hash} | **发现日期**：{YYYY-MM-DD}
+```
