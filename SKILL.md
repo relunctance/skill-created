@@ -633,7 +633,7 @@ curl -s -H "Authorization: token $TOKEN" https://api.github.com/user | jq .login
 | 原则 | 说明 |
 |------|------|
 | **拆分到 references** | 详细文档拆分到 `references/` 目录，主文件只保留概要 |
-| **主文件简洁** | 角色.md / SKILL.md 主文件控制在 1000 行以内，只放核心流程和引用 |
+| **主文件简洁** | 角色.md / SKILL.md 主文件控制在 900 行以内，只放核心流程和引用 |
 | **原子化** | 每个 reference 文件专注一个主题，便于单独更新 |
 | **引用完整性** | 拆分后必须同步更新主文件中的引用，确保不丢失 |
 
@@ -648,7 +648,7 @@ curl -s -H "Authorization: token $TOKEN" https://api.github.com/user | jq .login
 
 ```
 skill-name/
-├── SKILL.md              # 主文件 ≤1000 行，核心流程 + references 索引
+├── SKILL.md              # 主文件 ≤900 行，核心流程 + references 索引
 ├── README.md             # 入口文档
 ├── learns/               # 踩坑沉淀
 │   └── README.md
