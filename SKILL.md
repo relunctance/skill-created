@@ -105,10 +105,10 @@ tags:
 2. 流程/协议/格式定义 → 放 SKILL.md（SOP 章节）
 3. 精确计算/文件 IO → 放 scripts/
 
-### 第三步半：创建 learns/ 目录
+### 第三步半：创建 learns/ 和 references/ 目录
 
 ```bash
-mkdir -p learns
+mkdir -p learns references
 cat > learns/README.md << 'EOFLEARN'
 # {name} 踩坑沉淀
 
@@ -136,6 +136,18 @@ cat > learns/README.md << 'EOFLEARN'
 **相关 commit**：{commit hash} | **发现日期**：{YYYY-MM-DD}
 ```
 EOFLEARN
+
+cat > references/README.md << 'EOFREF'
+# {name} 参考文档
+
+> 详细文档按主题原子化拆分，主文件只保留概要。
+
+## 目录
+
+<!-- 按需创建具体 reference 文件 -->
+
+---
+EOFREF
 ```
 
 
@@ -408,8 +420,8 @@ TODAY=$(date +%Y-%m-%d)
 mkdir -p ~/repos/$NAME
 cd ~/repos/$NAME
 
-# 创建 learns/ 目录
-mkdir -p learns
+# 创建 learns/ 和 references/ 目录
+mkdir -p learns references
 cat > learns/README.md << 'EOFLEARN'
 # {NAME}
 
@@ -437,6 +449,18 @@ cat > learns/README.md << 'EOFLEARN'
 **相关 commit**：{commit hash} | **发现日期**：{YYYY-MM-DD}
 ```
 EOFLEARN
+
+cat > references/README.md << 'EOFREF'
+# {NAME} 参考文档
+
+> 详细文档按主题原子化拆分，主文件只保留概要。
+
+## 目录
+
+<!-- 按需创建具体 reference 文件 -->
+
+---
+EOFREF
 
 # 生成 SKILL.md
 cat > SKILL.md << 'SKILLEOF'
@@ -601,6 +625,8 @@ git push -u origin main
 ├── CURSOR.md             # Cursor 入口
 ├── WINDSURF.md           # Windsurf 入口
 ├── learns/               # 踩坑沉淀（按标签归档）
+│   └── README.md
+├── references/           # 详细文档（原子化，一个文件一个主题）
 │   └── README.md
 ├── .claude-plugin/       # Claude Code 插件元数据
 │   └── plugin.json

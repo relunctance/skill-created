@@ -26,18 +26,19 @@
 
 ---
 
-### SKILL.md 过长未按 references 拆分
+### skill-created 模板未强制 references/ 目录
 
-**问题**：SKILL.md 写到 3000 行，所有内容堆在一起，更新某章节时必须全文浏览，不同使用者无法只读某章节
+**问题**：skill-created 模板只有 learns/ 但没有 references/，导致创建的 skill 没有文档拆分结构
 
-**原因**：skill-created 模板没有强制约束主文件行数，开发者习惯性堆砌
+**原因**：模板缺少 references/ 目录初始化
 
-**解决**：新增「文档拆分原则」章节，强制要求：
-1. 主文件 ≤1000 行，只保留概要 + references 索引
-2. 详细文档拆分到 `references/` 目录（原子化，一个文件一个主题）
-3. references 文件必须含精确路径、行号、命令、JSON 结构
+**解决**：
+1. 模板第三步半增加 `mkdir -p learns references`
+2. 模板增加 references/README.md 生成
+3. 文件结构章节同步更新
+4. 完整示例部分两处均同步更新
 
-**相关 commit**：待提交 | **发现日期**：2026-05-21
+**相关 commit**：`e2e1be7` | **发现日期**：2026-05-21
 
 ---
 
