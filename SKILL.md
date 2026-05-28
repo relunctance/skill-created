@@ -38,6 +38,8 @@ tags:
 
 ## 使用方法
 
+> 🔴 **CHECKPOINT · 🛑 STOP**：收集完信息后**必须停止**，等待用户确认后再继续。
+
 ### 第一步：收集信息
 
 | 字段 | 说明 | 必填 | 示例 |
@@ -85,8 +87,21 @@ tags:
 {description}
 
 ## 设计原则
+### 模板结构（强制）
 
-**能用 SOP + LLM 解决的，坚决不加代码。代码越多 bug 越多。**
+每个 skill 必须包含以下目录：
+
+```
+{name}/
+├── SKILL.md              # 主文件 ≤1000 行，核心流程 + references 索引
+├── README.md             # 入口文档
+├── learns/               # 踩坑沉淀（按标签归档）
+│   └── README.md
+└── references/           # 详细文档（原子化，一个文件一个主题）
+    └── README.md         # 初始为空，按需创建具体 reference 文件
+```
+
+> **learns/ + references/ 强制**，缺一不可。learns 记录踩坑，references 拆分详细文档。
 
 | 该用代码 | 该用 SOP / LLM |
 |---------|----------------|
@@ -315,6 +330,8 @@ hermes skills install https://github.com/{author}/{name}
 
 ### 第七步：创建 GitHub 仓库
 
+> 🔴 **CHECKPOINT · 🛑 STOP**：创建 GitHub 仓库前**必须停止**，等待用户确认后再继续。
+
 ```bash
 curl -s -X POST https://api.github.com/user/repos \
   -H "Authorization: token $TOKEN" \
@@ -332,6 +349,8 @@ git push -u origin main
 ```
 
 ### 第九步：联动更新 gql-skills
+
+> 🔴 **CHECKPOINT · 🛑 STOP**：更新 gql-skills 前**必须停止**，等待用户确认后再继续。
 
 ```bash
 GQL_SKILLS=~/repos/gql-skills
@@ -708,3 +727,47 @@ skill-name/
 
 **相关 commit**：{hash} | **发现日期**：{YYYY-MM-DD}
 ```
+
+---
+
+## ⚠️ 反例与黑名单
+
+> **darwin-skill dim9 评分要求**：skill 必须有"不要做什么"的反例清单，只写"应该做 X"没有"不要做 Y"扣分
+
+### skill-created 禁止行为清单
+
+| ❌ 禁止 | 原因 | 正确做法 |
+|---------|------|----------|
+| ❌ 跳过信息收集直接创建 | 会导致仓库名/描述不准确 | 必须先收集 name/description/category/author |
+| ❌ 手动 git init 而不用 gql-skills 流程 | 会跳过 GitHub Actions 自动同步 | 用 gql-skills 流程创建 |
+| ❌ 在 WSL 用 `~` 做路径 | `~` 会展开到 Hermes profile home | 用绝对路径 `/home/gql/` |
+| ❌ 用 `git push -f` | 会丢失远程 commit | 禁止 force push |
+| ❌ 先创建后补文档 | 文档应该在创建时生成，不是之后补 | 创建时就生成完整 SKILL.md + README.md |
+| ❌ 创建 skill 不以 `-skill` 结尾 | 违反命名规范 | 强制以 `-skill` 结尾 |
+
+### 常见错误对照
+
+| 错误做法 | 问题 | 正确做法 |
+|----------|------|----------|
+| `mkdir ~/repos/foo` 在 WSL | `~` 展开错误 | `mkdir /home/gql/repos/foo` |
+| `git push -f` | 丢失远程 commit | `git push --force-with-lease` 或直接 push |
+| `cp -r` 复制整个 skill 仓库 | 可能复制到错误位置 | 用 gql-skills 同步机制 |
+| `gh repo create --source=. --push` | 在 Hermes profile 下会失败 | 先 `git remote add` 再 `gh repo create` |
+
+### 失败分支决策树
+
+```
+如果 gh repo create 报错 "Unable to add remote"
+→ 手动设置: git remote set-url origin https://github.com/$AUTHOR/$NAME.git
+
+如果 mkdir 报错 "Permission denied"
+→ 使用 sudo 或检查目录权限
+
+如果 git push 报错 "remote origin already exists"
+→ 先删除 remote: git remote remove origin
+
+如果 skill-created 执行到一半中断
+→ 检查已创建的文件，手动清理后重试
+```
+
+
