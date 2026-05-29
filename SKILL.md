@@ -11,7 +11,7 @@ triggers:
 category: devops
 author: relunctance
 created: 2026-05-08
-updated: 2026-05-15
+updated: 2026-05-30
 tags:
   - skill
   - skill-created
@@ -52,7 +52,12 @@ tags:
 | `platforms` | 目标平台（留空=全部） | ❌ | `claude codex openclaw` |
 
 > ⚠️ **命名规范**：所有 skill 必须以 `-skill` 结尾
->
+
+> ⚠️ **创建强制规范**（每次创建 skill 必须遵守）：
+> 1. **使用 `references/` 目录**：详细文档拆分到 `references/`，主文件 SKILL.md 尽可能小（≤600行）
+> 2. **必须美化 README**：创建完成后调用 readme-skill 美化 README
+> 3. **learns/ 必须创建**：记录踩坑沉淀
+
 > **platforms 默认值**：留空则生成全部平台（claude / codex / openclaw / hermes / cursor / windsurf）
 
 ### 第二步：初始化仓库
@@ -65,14 +70,16 @@ git config user.email "maomao@gql.ai"
 git config user.name "maomao"
 ```
 
-### 第三步：生成 SKILL.md（所有平台共用）
+### 第三步：生成 SKILL.md
 
 ```markdown
 ---
 name: {name}
 description: {description}
 triggers:
-{trigger_lines}
+  - 触发词1
+  - 触发词2
+  - 触发词3
 category: {category}
 author: {author}
 created: {YYYY-MM-DD}
@@ -86,45 +93,30 @@ tags:
 
 {description}
 
-## 设计原则
-### 模板结构（强制）
+## 触发条件
 
-每个 skill 必须包含以下目录：
+当需要以下操作时使用：
+- 触发词1
+- 触发词2
+- 触发词3
 
+## 核心流程
+
+<!-- 概要流程，详细信息拆分到 references/ -->
+
+## references/ 索引
+
+| 文件 | 内容 |
+|------|------|
+| references/README.md | 详细文档索引 |
 ```
-{name}/
-├── SKILL.md              # 主文件 ≤1000 行，核心流程 + references 索引
-├── README.md             # 入口文档
-├── learns/               # 踩坑沉淀（按标签归档）
-│   └── README.md
-└── references/           # 详细文档（原子化，一个文件一个主题）
-    └── README.md         # 初始为空，按需创建具体 reference 文件
-```
-
-> **learns/ + references/ 强制**，缺一不可。learns 记录踩坑，references 拆分详细文档。
-
-| 该用代码 | 该用 SOP / LLM |
-|---------|----------------|
-| 精确计算（时间戳、diff 百分比） | 决策判断（歧义、优先级） |
-| 文件 I/O（确定性读写） | 文本处理（格式化、提取） |
-| 精确序列化（JSON 结构） | 工作流编排（SOP 章节） |
-
-**操作顺序**：
-1. 先问「能否用 SOP + LLM 解决？」
-2. 再问「最小化代码方案是什么？」
-3. 最后再动手写代码
-
-## 约束
-
-1. 单一改动 < 150 行新增代码
-2. 流程/协议/格式定义 → 放 SKILL.md（SOP 章节）
-3. 精确计算/文件 IO → 放 scripts/
 
 ### 第三步半：创建 learns/ 和 references/ 目录
 
 ```bash
 mkdir -p learns references
-cat > learns/README.md << 'EOFLEARN'
+
+cat > learns/README.md << 'EOF'
 # {name} 踩坑沉淀
 
 > 开发/维护过程中遇到的所有坑，按标签归档。
@@ -150,9 +142,9 @@ cat > learns/README.md << 'EOFLEARN'
 
 **相关 commit**：{commit hash} | **发现日期**：{YYYY-MM-DD}
 ```
-EOFLEARN
+EOF
 
-cat > references/README.md << 'EOFREF'
+cat > references/README.md << 'EOF'
 # {name} 参考文档
 
 > 详细文档按主题原子化拆分，主文件只保留概要。
@@ -160,12 +152,10 @@ cat > references/README.md << 'EOFREF'
 ## 目录
 
 <!-- 按需创建具体 reference 文件 -->
-
----
-EOFREF
+EOF
 ```
 
-
+### 第四步：生成平台入口文件
 
 ```bash
 # 默认全平台，也可指定 PLATFORMS="claude codex openclaw"
@@ -180,11 +170,12 @@ for platform in $PLATFORMS; do
 {description}
 
 ## 触发条件
-{trigger_lines_plain}
+
+触发词1 / 触发词2 / 触发词3
 
 ## 快速开始
 
-{content}
+<!-- 用户补充 -->
 EOF
       ;;
     codex)
@@ -194,11 +185,12 @@ EOF
 {description}
 
 ## 触发条件
-{trigger_lines_plain}
+
+触发词1 / 触发词2 / 触发词3
 
 ## 快速开始
 
-{content}
+<!-- 用户补充 -->
 EOF
       ;;
     openclaw|hermes)
@@ -208,11 +200,12 @@ EOF
 {description}
 
 ## 触发条件
-{trigger_lines_plain}
+
+触发词1 / 触发词2 / 触发词3
 
 ## 快速开始
 
-{content}
+<!-- 用户补充 -->
 
 ## 安装
 
@@ -226,11 +219,12 @@ EOF
 {description}
 
 ## 触发条件
-{trigger_lines_plain}
+
+触发词1 / 触发词2 / 触发词3
 
 ## 快速开始
 
-{content}
+<!-- 用户补充 -->
 EOF
       ;;
     windsurf)
@@ -240,97 +234,39 @@ EOF
 {description}
 
 ## 触发条件
-{trigger_lines_plain}
+
+触发词1 / 触发词2 / 触发词3
 
 ## 快速开始
 
-{content}
+<!-- 用户补充 -->
 EOF
       ;;
   esac
 done
 ```
 
-### 第五步：生成平台插件目录（可选）
+### 第五步：README 美化
+
+> 🔴 **强制步骤**：创建完 SKILL.md 后必须调用 readme-skill 美化 README
 
 ```bash
-# .claude-plugin/plugin.json
-mkdir -p .claude-plugin
-cat > .claude-plugin/plugin.json << 'EOF'
-{
-  "name": "{name}",
-  "version": "1.0.0",
-  "description": "{description}",
-  "author": "{author}",
-  "homepage": "https://github.com/{author}/{name}",
-  "repository": "https://github.com/{author}/{name}",
-  "license": "MIT",
-  "skills": "./"
-}
-EOF
-
-# .codex-plugin/plugin.json
-mkdir -p .codex-plugin
-cat > .codex-plugin/plugin.json << 'EOF'
-{
-  "name": "{name}",
-  "version": "1.0.0",
-  "description": "{description}",
-  "author": "{author}",
-  "homepage": "https://github.com/{author}/{name}",
-  "repository": "https://github.com/{author}/{name}",
-  "license": "MIT",
-  "skills": "./"
-}
-EOF
-
-# .opencode/plugins/{name}.json
-mkdir -p .opencode/plugins
-cat > .opencode/plugins/{name}.json << 'EOF'
-{
-  "name": "{name}",
-  "version": "1.0.0",
-  "description": "{description}",
-  "author": "{author}",
-  "homepage": "https://github.com/{author}/{name}",
-  "repository": "https://github.com/{author}/{name}",
-  "license": "MIT",
-  "skills": "./"
-}
-EOF
+# 加载 readme-skill 并美化 README
+# 参照 readme-skill 的规范检查并更新 README
+# 必须包含：License、Version、Platforms、Category 徽章
+# 必须包含：触发条件、安装、核心功能章节
 ```
 
-### 第六步：生成 README.md
+### 第六步：提交
 
-```markdown
-# {name}
-
-{description}
-
-## 支持平台
-
-![Claude](https://img.shields.io/badge/Claude-Code-blue)
-![Codex](https://img.shields.io/badge/Codex-OpenAI-green)
-![OpenClaw](https://img.shields.io/badge/OpenClaw-Hermes-orange)
-![Cursor](https://img.shields.io/badge/Cursor-AI-purple)
-![Windsurf](https://img.shields.io/badge/Windsurf-AI-red)
-
-## 触发条件
-
-{trigger_lines_plain}
-
-## 快速开始
-
-{content}
-
-## 安装
-
-hermes skills install https://github.com/{author}/{name}
+```bash
+git add .
+git commit -m "feat: initial {name} skill"
 ```
-
-### 第七步：创建 GitHub 仓库
 
 > 🔴 **CHECKPOINT · 🛑 STOP**：创建 GitHub 仓库前**必须停止**，等待用户确认后再继续。
+
+### 第七步：创建 GitHub 仓库
 
 ```bash
 curl -s -X POST https://api.github.com/user/repos \
@@ -341,8 +277,6 @@ curl -s -X POST https://api.github.com/user/repos \
 ### 第八步：推送
 
 ```bash
-git add .
-git commit -m "feat: initial {name} skill"
 git branch -M main
 git remote add origin https://github.com/{author}/{name}.git
 git push -u origin main
@@ -357,287 +291,21 @@ GQL_SKILLS=~/repos/gql-skills
 [ ! -d "$GQL_SKILLS" ] && git clone https://github.com/relunctance/gql-skills.git "$GQL_SKILLS"
 cd "$GQL_SKILLS"
 
-NEW_NAME={name}
-NEW_DESC={description}
-NEW_CATEGORY={category}
-AUTHOR={author}
-
-ROW="| $NEW_NAME | 🏠内部 | $NEW_DESC | [repo](https://github.com/$AUTHOR/$NEW_NAME) · [SKILL.md](https://github.com/$AUTHOR/$NEW_NAME/blob/main/SKILL.md) |"
-
-case "$NEW_CATEGORY" in
-  Infrastructure)  TARGET="## 基础设施 Infrastructure" ;;
-  DevOps|Devops)   TARGET="## 开发工具 DevOps" ;;
-  AI/ML|AI|ML)    TARGET="## AI 与机器学习 AI/ML" ;;
-  Productivity)    TARGET="## 效率工具 Productivity" ;;
-  *)               TARGET="## 实验性 Experimental" ;;
-esac
-
-awk -v target="$TARGET" -v row="$ROW" '
-  BEGIN { in_section=0 }
-  $0 == target { in_section=1; print; next }
-  in_section && /^## / { in_section=0 }
-  in_section && /^\| Skill/ { print; next }
-  in_section && /^\|---/ { capturing=1; print; next }
-  in_section && capturing && /^\|/ { print row; capturing=0 }
-  { print }
-' README.md > README.md.tmp && mv README.md.tmp README.md
-
-awk -v target="$TARGET" -v row="$ROW" '
-  BEGIN { in_section=0 }
-  $0 == target { in_section=1; print; next }
-  in_section && /^## / { in_section=0 }
-  in_section && /^\| Skill/ { print; next }
-  in_section && /^\|---/ { capturing=1; print; next }
-  in_section && capturing && /^\|/ { print row; capturing=0 }
-  { print }
-' SKILL.md > SKILL.md.tmp && mv SKILL.md.tmp SKILL.md
-
-TODAY=$(date +%Y-%m-%d)
-CHANGELOG_ROW="| $TODAY | 添加 | $NEW_NAME 🏠内部 | 新建 skill |"
-sed -i "2a\\$CHANGELOG_ROW" README.md
-sed -i "2a\\$CHANGELOG_ROW" SKILL.md
-
+# 添加到对应分类表格
+# ...
 git add .
-git commit -m "feat: 添加 $NEW_NAME skill"
+git commit -m "feat: 添加 {name} skill"
 git push origin main
 ```
 
-### 第十步：README 检查与美化
-
-```bash
-# 必须包含的徽章：
-# - License (MIT)  →  ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-# - version        →  ![version](https://img.shields.io/badge/version-X.Y.Z-green.svg)
-# - platforms      →  ![platforms](https://img.shields.io/badge/platforms-claude%20%7C%20openclaw-blue.svg)
-# - category       →  ![category](https://img.shields.io/badge/category-{category}-blue.svg)
-
-# 必须包含的章节：
-# - ## 触发条件
-# - ## 安装
-# - ## 功能特性（或 ## 特性）
-```
-
-**注意**：这一步必须执行，不能跳过。README 美化是 skill 质量的基本要求。
-
 ---
-
-## 完整执行示例
-
-```bash
-# name/description/triggers/category/author 必填
-# platforms 留空 = 生成全部平台
-
-NAME=my-awesome-skill
-DESC="一个超棒的 skill"
-TRIGGERS="触发词1|触发词2|触发词3"
-CATEGORY=devops
-AUTHOR=relunctance
-PLATFORMS=""  # 留空生成全部，或 "claude codex openclaw"
-
-TODAY=$(date +%Y-%m-%d)
-
-mkdir -p ~/repos/$NAME
-cd ~/repos/$NAME
-
-# 创建 learns/ 和 references/ 目录
-mkdir -p learns references
-cat > learns/README.md << 'EOFLEARN'
-# {NAME}
-
-> 开发/维护过程中遇到的所有坑，按标签归档。
-
-## 🏷️ 按标签索引
-
-<!-- 初次创建时为空，后续按需追加 -->
-
----
-
-## 记录规范
-
-遇到新坑时，在对应标签下追加记录：
-
-```markdown
-### {一句话描述}
-
-**问题**：{具体现象}
-
-**原因**：{根本原因}
-
-**解决**：{解决方案}
-
-**相关 commit**：{commit hash} | **发现日期**：{YYYY-MM-DD}
-```
-EOFLEARN
-
-cat > references/README.md << 'EOFREF'
-# {NAME} 参考文档
-
-> 详细文档按主题原子化拆分，主文件只保留概要。
-
-## 目录
-
-<!-- 按需创建具体 reference 文件 -->
-
----
-EOFREF
-
-# 生成 SKILL.md
-cat > SKILL.md << 'SKILLEOF'
----
-name: {NAME}
-description: {DESC}
-triggers:
-  - 触发词1
-  - 触发词2
-  - 触发词3
-category: devops
-author: {AUTHOR}
-created: {TODAY}
-updated: {TODAY}
-platforms: all
-tags:
-  - example
----
-
-# {NAME}
-
-{DESC}
-
-## 快速开始
-
-<!-- 用户补充 -->
-SKILLEOF
-
-# 生成全部平台入口
-for platform in claude codex openclaw hermes cursor windsurf; do
-  case $platform in
-    claude)
-      cat > CLAUDE.md << 'EOF'
-# {NAME}
-
-{DESC}
-
-## 触发条件
-
-触发词1 / 触发词2 / 触发词3
-
-## 快速开始
-
-<!-- 用户补充 -->
-EOF
-      ;;
-    codex)
-      cat > CODEX.md << 'EOF'
-# {NAME}
-
-{DESC}
-
-## 触发条件
-
-触发词1 / 触发词2 / 触发词3
-
-## 快速开始
-
-<!-- 用户补充 -->
-EOF
-      ;;
-    openclaw|hermes)
-      cat > AGENTS.md << 'EOF'
-# {NAME}
-
-{DESC}
-
-## 触发条件
-
-触发词1 / 触发词2 / 触发词3
-
-## 快速开始
-
-<!-- 用户补充 -->
-
-## 安装
-
-hermes skills install https://github.com/{AUTHOR}/{NAME}
-EOF
-      ;;
-    cursor)
-      cat > CURSOR.md << 'EOF'
-# {NAME}
-
-{DESC}
-
-## 触发条件
-
-触发词1 / 触发词2 / 触发词3
-
-## 快速开始
-
-<!-- 用户补充 -->
-EOF
-      ;;
-    windsurf)
-      cat > WINDSURF.md << 'EOF'
-# {NAME}
-
-{DESC}
-
-## 触发条件
-
-触发词1 / 触发词2 / 触发词3
-
-## 快速开始
-
-<!-- 用户补充 -->
-EOF
-      ;;
-  esac
-done
-
-# 生成 README.md
-cat > README.md << 'EOF'
-# {NAME}
-
-{DESC}
-
-## 支持平台
-
-![Claude](https://img.shields.io/badge/Claude-Code-blue)
-![Codex](https://img.shields.io/badge/Codex-OpenAI-green)
-![OpenClaw](https://img.shields.io/badge/OpenClaw-Hermes-orange)
-![Cursor](https://img.shields.io/badge/Cursor-AI-purple)
-![Windsurf](https://img.shields.io/badge/Windsurf-AI-red)
-
-## 触发条件
-
-触发词1 / 触发词2 / 触发词3
-
-## 快速开始
-
-<!-- 用户补充 -->
-
-## 安装
-
-hermes skills install https://github.com/{AUTHOR}/{NAME}
-EOF
-
-git init
-git add . && git commit -m "feat: initial {NAME} skill"
-
-# 创建 GitHub 仓库
-curl -s -X POST https://api.github.com/user/repos \
-  -H "Authorization: token $TOKEN" \
-  -d "{\"name\":\"$NAME\",\"description\":\"$DESC\",\"private\":false}"
-
-git remote add origin https://github.com/$AUTHOR/$NAME.git
-git push -u origin main
-```
 
 ## 文件结构
 
 ```
 {name}/
-├── SKILL.md              # 所有平台共用（平台无关）
-├── README.md             # 文档主页
+├── SKILL.md              # 主文件 ≤600 行，核心流程 + references 索引
+├── README.md             # 入口文档（必须美化）
 ├── AGENTS.md             # OpenClaw / Hermes 入口
 ├── CLAUDE.md             # Claude Code 入口
 ├── CODEX.md              # Codex 入口
@@ -645,22 +313,29 @@ git push -u origin main
 ├── WINDSURF.md           # Windsurf 入口
 ├── learns/               # 踩坑沉淀（按标签归档）
 │   └── README.md
-├── references/           # 详细文档（原子化，一个文件一个主题）
-│   └── README.md
-├── .claude-plugin/       # Claude Code 插件元数据
-│   └── plugin.json
-├── .codex-plugin/       # Codex 插件元数据
-│   └── plugin.json
-└── .opencode/           # OpenCode 插件目录
-    └── plugins/
+└── references/           # 详细文档（原子化，一个文件一个主题）
+    └── README.md
 ```
 
-## 踩坑沉淀
+## 设计原则
 
-> **历史踩坑记录已迁移到 `learns/` 目录**，按标签归档，持续更新。
+| 该用代码 | 该用 SOP / LLM |
+|---------|----------------|
+| 精确计算（时间戳、diff 百分比） | 决策判断（歧义、优先级） |
+| 文件 I/O（确定性读写） | 文本处理（格式化、提取） |
+| 精确序列化（JSON 结构） | 工作流编排（SOP 章节） |
 
-<!-- 以下为 skill-created 自身遇到的坑（供参考） -->
-<!-- 完整记录见 `learns/README.md` -->
+**操作顺序**：
+1. 先问「能否用 SOP + LLM 解决？」
+2. 再问「最小化代码方案是什么？」
+3. 最后再动手写代码
+
+## 约束
+
+1. 单一改动 < 150 行新增代码
+2. 流程/协议/格式定义 → 放 SKILL.md（SOP 章节）
+3. 精确计算/文件 IO → 放 scripts/
+4. **SKILL.md 尽可能小**，详细内容拆分到 references/
 
 ## GitHub Token
 
@@ -669,70 +344,9 @@ TOKEN=$(grep "oauth_token:" ~/.config/gh/hosts.yml | head -1 | awk '{print $2}')
 curl -s -H "Authorization: token $TOKEN" https://api.github.com/user | jq .login
 ```
 
----
+## 踩坑沉淀
 
-## 文档拆分原则（Skill 创作强制规范）
-
-> ⚠️ **所有 Skill 创作必须遵循**，也是所有 AGENTS.md 的通用原则。
-
-| 原则 | 说明 |
-|------|------|
-| **拆分到 references** | 详细文档拆分到 `references/` 目录，主文件只保留概要 |
-| **主文件简洁** | 角色.md / SKILL.md 主文件控制在 900 行以内，只放核心流程和引用 |
-| **原子化** | 每个 reference 文件专注一个主题，便于单独更新 |
-| **引用完整性** | 拆分后必须同步更新主文件中的引用，确保不丢失 |
-
-### 违反案例
-
-一个 SKILL.md 写到 3000 行，所有内容堆在一起：
-- 更新某章节时必须全文浏览才能定位
-- 不同使用者关注点不同，但无法只读某章节
-- diff 满天飞，review 困难
-
-### 正确做法
-
-```
-skill-name/
-├── SKILL.md              # 主文件 ≤900 行，核心流程 + references 索引
-├── README.md             # 入口文档
-├── learns/               # 踩坑沉淀
-│   └── README.md
-└── references/           # 详细文档（原子化，一个文件一个主题）
-    ├── API.md            # 精确 API paths、JSON structures、line numbers
-    ├── CONFIG.md         # 配置项详解
-    ├── TROUBLESHOOTING.md # 调试步骤
-    └── EXAMPLES.md       # 完整示例
-```
-
-### references/ 内容规范
-
-每个 reference 文件必须包含：
-- **精确路径**（文件路径 + 行号）
-- **具体命令**（带预期输出）
-- **JSON/配置结构**（完整可复制）
-- **验证清单**（可操作的 checklist）
-
-### 踩坑记录要求
-
-发现坑时立即记录到 `learns/`，不等待任务完成：
-
-```markdown
-### {一句话描述}
-
-**问题**：{具体现象}
-
-**原因**：{根本原因}
-
-**解决**：{解决方案}
-
-**相关 commit**：{hash} | **发现日期**：{YYYY-MM-DD}
-```
-
----
-
-## ⚠️ 反例与黑名单
-
-> **darwin-skill dim9 评分要求**：skill 必须有"不要做什么"的反例清单，只写"应该做 X"没有"不要做 Y"扣分
+> **历史踩坑记录已迁移到 `learns/` 目录**，按标签归档，持续更新。
 
 ### skill-created 禁止行为清单
 
@@ -744,30 +358,5 @@ skill-name/
 | ❌ 用 `git push -f` | 会丢失远程 commit | 禁止 force push |
 | ❌ 先创建后补文档 | 文档应该在创建时生成，不是之后补 | 创建时就生成完整 SKILL.md + README.md |
 | ❌ 创建 skill 不以 `-skill` 结尾 | 违反命名规范 | 强制以 `-skill` 结尾 |
-
-### 常见错误对照
-
-| 错误做法 | 问题 | 正确做法 |
-|----------|------|----------|
-| `mkdir ~/repos/foo` 在 WSL | `~` 展开错误 | `mkdir /home/gql/repos/foo` |
-| `git push -f` | 丢失远程 commit | `git push --force-with-lease` 或直接 push |
-| `cp -r` 复制整个 skill 仓库 | 可能复制到错误位置 | 用 gql-skills 同步机制 |
-| `gh repo create --source=. --push` | 在 Hermes profile 下会失败 | 先 `git remote add` 再 `gh repo create` |
-
-### 失败分支决策树
-
-```
-如果 gh repo create 报错 "Unable to add remote"
-→ 手动设置: git remote set-url origin https://github.com/$AUTHOR/$NAME.git
-
-如果 mkdir 报错 "Permission denied"
-→ 使用 sudo 或检查目录权限
-
-如果 git push 报错 "remote origin already exists"
-→ 先删除 remote: git remote remove origin
-
-如果 skill-created 执行到一半中断
-→ 检查已创建的文件，手动清理后重试
-```
-
-
+| ❌ SKILL.md 写得太大 | 违反「尽可能小」原则 | 详细内容拆分到 references/ |
+| ❌ 跳过 README 美化 | README 质量影响 skill 可用性 | 必须调用 readme-skill 美化 |
