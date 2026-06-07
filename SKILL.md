@@ -2,15 +2,17 @@
 name: skill-created
 description: Skill 工厂 — 一键创建标准化 GitHub 公开仓库 + SKILL.md，零成本适配全平台（claude/codex/openclaw/hermes/cursor/windsurf）
 triggers:
+  - skill-created
+  - skill-created --upgrade
   - 创建一个 skill
   - 创建 skill 仓库
   - 新建 skill
   - skill 创建器
   - skill boilerplate
   - 创建多平台 skill
-  - skill-created --upgrade
   - 为某个 skill 添加 learns/
   - 升级已有 skill 的进化机制
+  - 创建名叫 skill-created 的 skill
 category: devops
 author: relunctance
 created: 2026-05-08
@@ -121,6 +123,7 @@ git push
 > 5. **BDD + TDD 开发**：写代码必须先写 BDD 注释，再 TDD 实现
 > 6. **远程分支 main**：所有新仓库 `git branch -M main`
 > 7. **GitHub About 信息**：创建仓库时必须填写 description
+> 8. **skill-created 必须触发 + 仓库名必须是触发词**：用户说 "skill-created" 必须加载本 skill；新建 skill 仓库名也必须是触发词（如 skill-created / plan-skill / darwin-skill）
 
 > **platforms 默认值**：留空则生成全部平台（claude / codex / openclaw / hermes / cursor / windsurf）
 
