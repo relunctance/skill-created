@@ -16,7 +16,8 @@ triggers:
 category: devops
 author: relunctance
 created: 2026-05-08
-updated: 2026-06-10
+updated: 2026-06-11
+license: MIT
 tags:
   - skill
   - skill-created
