@@ -29,9 +29,69 @@ tags:
 
 > 一键创建标准化 skill GitHub 仓库
 >
-> **零成本全平台适配** — 不填 platforms 时，自动生成所有平台入口文件（CLAUDE.md / CODEX.md / AGENTS.md / CURSOR.md / WINDSURF.md）和平台插件元数据（`.claude-plugin/` / `.codex-plugin/` / `.cursor-plugin/` / `.opencode/`）
+> **零成本全平台适配** — platforms 留空时，自动生成所有平台入口文件（CLAUDE.md / CODEX.md / AGENTS.md / CURSOR.md / WINDSURF.md）
 >
-> **内置自我进化机制** — 每个新 skill 都包含 learns/ 问题积累 + scripts/feedback.py + evolution-skill 扫描闭环
+> **内置自我进化机制** — 每个新 skill 自带 learns/ + scripts/feedback.py，可接入 evolve-skill
+
+---
+
+## 设计原则
+
+**能用 SOP + LLM 解决的，坚决不加代码。代码越多 bug 越多。**
+
+| 该用 SOP/LLM | 该用代码 |
+|--------------|---------|
+| 工作流编排 | 精确计算（时间戳、diff 百分比） |
+| 策略/评分规则 | 确定性文件 IO |
+| LLM 调用（直接 httpx） | 幂等脚本（< 50 行） |
+| 文本处理/格式化 | |
+
+**操作顺序**：先问「能否用 SOP 解决？」→ 再问「最小化代码方案？」→ 最后动手写代码。
+
+---
+
+## 文件结构（create 模式产出）
+
+```
+{name}/
+├── SKILL.md              # 主入口（≤600行，核心流程 + references 索引）
+├── README.md             # 英文文档主页（顶部引用中文版）
+├── README_zh.md          # 中文文档主页（顶部引用英文版）
+├── LICENSE               # MIT License
+├── AGENTS.md             # OpenClaw / Hermes 入口
+├── CLAUDE.md             # Claude Code 入口
+├── CODEX.md              # Codex 入口
+├── CURSOR.md             # Cursor 入口
+├── WINDSURF.md           # Windsurf 入口
+├── learns/               # 踩坑沉淀 + 自我进化
+│   ├── README.md
+│   └── self-improvement.md
+├── scripts/              #（如有代码）
+│   └── feedback.py
+└── references/           # 详细文档（原子化）
+    └── README.md
+```
+
+---
+
+## 约束表
+
+|| # | 约束 | 说明 |
+|---|------|------|------|
+| 1 | `references/` 目录 | 详细文档拆分到 `references/`，SKILL.md ≤ 600 行 |
+| 2 | 中英双语 README | README.md（英文）+ README_zh.md（中文），顶部互相引用 |
+| 3 | 必须美化 README | 创建完成后调用 readme-skill 美化（中英文都要） |
+| 4 | `learns/` 必须创建 | 记录踩坑沉淀，供 evolve-skill 扫描 |
+| 5 | BDD + TDD 开发 | 写代码必须先写 BDD 注释，再 TDD 实现 |
+| 6 | 远程分支 main | 所有新仓库 `git branch -M main` |
+| 7 | GitHub About 必填 | 创建仓库时必须填写 description |
+| 8 | 仓库名 = 触发词 | 新建 skill 仓库名必须是触发词 |
+| 9 | platforms 留空 = 全平台 | 默认生成全部 5 个平台入口 |
+| 10 | 每步 commit 后再继续 | 小步迭代，每步验证通过后立即 commit |
+| 11 | 一键安装说明 | README 必须含 `curl ... | bash` 一键安装 + 依赖说明 |
+| 12 | 欢迎贡献章节 | README 必须包含 CONTRIBUTING 说明 |
+
+---
 
 ## 触发条件
 
@@ -52,53 +112,9 @@ tags:
 - `为某个 skill 添加 learns/`
 - `升级已有 skill 的进化机制`
 
-**Step 1：检查缺失文件**
-```
-检查 target-skill 目录下：
-├── learns/
-│   ├── README.md
-│   ├── self-improvement.md
-│   └── *-problems.md（可选，初次为空）
-├── scripts/
-│   └── feedback.py
-```
+---
 
-**Step 2：注入 scaffold（缺少什么补什么）**
-
-生成并写入 `learns/README.md`：
-```markdown
-# {name} 踩坑沉淀
-
-> 开发/维护过程中遇到的所有坑，按标签归档。
-
-## 🏷️ 按标签索引
-
-<!-- 初次创建时为空，后续按需追加 -->
-```
-
-生成并写入 `learns/self-improvement.md`：
-```markdown
-# 自我进化机制
-
-> 本 skill 内置自我进化闭环，持续积累经验并自动优化。
-...
-```
-
-生成并写入 `scripts/feedback.py`（纯 Python stdlib，零依赖）。
-
-**Step 3：运行 readme-skill 美化**（必须）
-
-**Step 4：commit + push**
-
-```bash
-git add .
-git commit -m "feat: add evolution scaffold (learns/ + feedback.py)"
-git push
-```
-
-**Step 5：更新 gql-skills**（关联 issue）
-
-## 使用方法
+## create 模式：8 步流程
 
 > 🔴 **CHECKPOINT · 🛑 STOP**：收集完信息后**必须停止**，等待用户确认后再继续。
 
@@ -106,160 +122,88 @@ git push
 
 | 字段 | 说明 | 必填 | 示例 |
 |------|------|------|------|
-| `name` | skill 名称（kebab-case，**必须以 `-skill` 结尾**） | ✅ | `dir-skill` |
-| `description` | 一句话描述（中文） | ✅ | `为项目添加标准目录结构` |
-| `triggers` | 触发关键词（中文） | ✅ | `项目目录结构`, `初始化项目` |
-| `category` | 分类 | ✅ | `devops` / `data-science` 等 |
+| `name` | skill 名称（kebab-case，**必须以 `-skill` 结尾**） | ✅ | `beautify-readme` |
+| `description` | 一句话描述（中文） | ✅ | `自动美化 README 文档` |
+| `triggers` | 触发关键词（中文） | ✅ | `美化 README`, `readme 美化` |
+| `category` | 分类 | ✅ | `productivity` / `devops` 等 |
 | `author` | GitHub 用户名 | ✅ | `relunctance` |
-| `platforms` | 目标平台（留空=全部） | ❌ | `claude codex openclaw` |
-
-> ⚠️ **命名规范**：所有 skill 必须以 `-skill` 结尾
-
-> ⚠️ **创建强制规范**（每次创建 skill 必须遵守）：
-> 1. **使用 `references/` 目录**：详细文档拆分到 `references/`，主文件 SKILL.md 尽可能小（≤600行）
-> 2. **必须美化 README**：创建完成后调用 readme-skill 美化 README（中英文都要）
-> 3. **learns/ 必须创建**：记录踩坑沉淀
-> 4. **代码优先 Python**：涉及代码的 skill 优先使用 Python
-> 5. **BDD + TDD 开发**：写代码必须先写 BDD 注释，再 TDD 实现
-> 6. **远程分支 main**：所有新仓库 `git branch -M main`
-> 7. **GitHub About 信息**：创建仓库时必须填写 description
-> 8. **skill-created 必须触发 + 仓库名必须是触发词**：用户说 "skill-created" 必须加载本 skill；新建 skill 仓库名也必须是触发词（如 skill-created / plan-skill / darwin-skill）
-
-> **platforms 默认值**：留空则生成全部平台（claude / codex / openclaw / hermes / cursor / windsurf）
+| `platforms` | 目标平台（留空=全部5平台） | ❌ | `claude codex` |
 
 ### 第二步：初始化仓库
 
 ```bash
-mkdir -p ~/repos/{name}
-cd ~/repos/{name}
+mkdir -p /home/gql/repos/{name}
+cd /home/gql/repos/{name}
 git init
 git config user.email "maomao@gql.ai"
 git config user.name "maomao"
 ```
 
-### 第三步：生成 SKILL.md
+### 第三步：生成 SKILL.md + learns/ + references/
 
+生成 `SKILL.md`（含 frontmatter + 核心流程 + references 索引）。
+
+生成 `learns/README.md`：
 ```markdown
----
-name: {name}
-description: {description}
-triggers:
-  - 触发词1
-  - 触发词2
-  - 触发词3
-category: {category}
-author: {author}
-created: {YYYY-MM-DD}
-updated: {YYYY-MM-DD}
-platforms: all
-tags:
-  - {name}
----
+# {name} 踩坑沉淀
 
-# {name}
+> 开发/维护过程中遇到的所有坑，按标签归档。
 
-{description}
-
-## 触发条件
-
-当需要以下操作时使用：
-- 触发词1
-- 触发词2
-- 触发词3
-
-## 核心流程
-
-<!-- 概要流程，详细信息拆分到 references/ -->
-
-## references/ 索引
-
-| 文件 | 内容 |
-|------|------|
-| [references/create-flow.md](references/create-flow.md) | create 模式完整流程（第四步~第九步 + README 模板） |
-| [references/upgrade-mode.md](references/upgrade-mode.md) | upgrade 模式 SOP + feedback.py 模板 |
-
-> 📌 **提示**：详细的 bash 脚本和 README 模板已拆分到 `references/` 目录，主文件只保留流程概要。
-
----
-
-## 核心流程（create 模式）
-
-> 详细信息拆分到 [references/create-flow.md](references/create-flow.md)。
-
-| 步骤 | 说明 | 详情 |
-|------|------|------|
-| 第三步半 | 创建 learns/ + references/ 目录 | [create-flow.md](references/create-flow.md) |
-| 第三步半续 | 创建 learns/self-improvement.md | [upgrade-mode.md](references/upgrade-mode.md) |
-| 第三步半续续 | 创建 scripts/feedback.py | [upgrade-mode.md](references/upgrade-mode.md) |
-| 第四步 | 生成平台入口文件 | [create-flow.md](references/create-flow.md) |
-| 第四步半 | 生成 README.md + README_zh.md | [create-flow.md](references/create-flow.md) |
-| 第五步 | readme-skill 美化 | [create-flow.md](references/create-flow.md) |
-| 第六步 | git commit | [create-flow.md](references/create-flow.md) |
-| 第七步 | 创建 GitHub 仓库 | [create-flow.md](references/create-flow.md) |
-| 第八步 | git push | [create-flow.md](references/create-flow.md) |
-| 第九步 | 联动更新 gql-skills | [create-flow.md](references/create-flow.md) |
-
----
-
-
-## 文件结构
-
-```
-{name}/
-├── SKILL.md           # 主入口
-├── README.md          # English
-├── README_zh.md       # 中文
-├── scripts/           # （如有代码）
-└── learns/           # 自我进化
+## 🏷️ 按标签索引
 ```
 
-## 安装后验证
+生成 `references/README.md`：
+```markdown
+# references/
 
-- [ ] Skill 加载成功
-- [ ] 触发词生效
-- [ ] 基础功能验证通过
-
-## 欢迎贡献
-
-欢迎提交 Issue 和 PR！
-
-## 许可证
-
-MIT
-EOFZHSELF
+## 📚 文档索引
 ```
+
+### 第四步：生成 README.md + README_zh.md
 
 > ⚠️ **中英文 README 强制规则**：
-> - 顶部第一行必须互相引用：`**[English](README.md) · [中文](README_zh.md)**`
+> - 顶部第一行互相引用：`**[English](README.md) · [中文](README_zh.md)**`
 > - 两个文件都必须有 `---` frontmatter（`search: false`）
-> - 生成后立即调用 readme-skill 美化，不要手动编辑
 
-### 第五步：README 美化（中英文）
-
-> 🔴 **强制步骤**：必须对 README.md 和 README_zh.md 都调用 readme-skill 美化
+### 第五步：调用 readme-skill 美化（中英文）
 
 ```bash
-# 检查 readme-skill 是否安装，没有则自动安装
+# 检查 readme-skill
 if ! hermes skills list 2>/dev/null | grep -q "readme-skill"; then
-  echo "readme-skill not found, installing..."
   hermes skills install https://github.com/relunctance/readme-skill
 fi
 
-# 加载 readme-skill 并美化 README.md
+# 美化英文版
 hermes skills run readme-skill --path ./README.md
 
-# 加载 readme-skill 并美化 README_zh.md
+# 美化中文版
 hermes skills run readme-skill --path ./README_zh.md
 ```
 
-> ⚠️ **readme-skill 美化标准**：
+> ⚠️ readme-skill 美化标准：
 > - 必须包含：License、Version、Platforms、Category 徽章
 > - 必须包含：中英文互相引用（顶部第一行）
 > - 必须包含：触发条件、安装、核心功能章节
 > - 必须包含：安装后验证 checklist（`- [ ]` 格式）
 > - 禁止在 README 中写"Known Pitfalls"（放 learns/ 或 CONTRIBUTING.md）
 
-### 第六步：提交
+> 🔴 **每步验证后 commit**：完成 README 美化后立即验证并 commit，不等到最后。
+
+### 第六步：验证
+
+```bash
+# 语法检查
+bash -n install.sh
+python3 -m py_compile scripts/*.py
+
+# 实际运行 install.sh（如有）
+bash install.sh
+
+# 验证文件结构
+ls -la /home/gql/repos/{name}/
+```
+
+### 第七步：git commit
 
 ```bash
 git add .
@@ -268,7 +212,7 @@ git commit -m "feat: initial {name} skill"
 
 > 🔴 **CHECKPOINT · 🛑 STOP**：创建 GitHub 仓库前**必须停止**，等待用户确认后再继续。
 
-### 第七步：创建 GitHub 仓库
+### 第八步：创建 GitHub 仓库 + 推送
 
 ```bash
 # About 信息 = description 字段
@@ -277,309 +221,106 @@ gh repo create {name} \
   --public \
   --source=. \
   --push
-```
 
-> ⚠️ **About 信息（description）必须填写**，否则 GitHub 显示"No description"影响可发现性。
-
-### 第八步：推送
-
-```bash
 git branch -M main
 git remote add origin https://github.com/{author}/{name}.git
 git push -u origin main
 ```
 
-### 第九步：联动更新 gql-skills
+---
 
-> 🔴 **CHECKPOINT · 🛑 STOP**：更新 gql-skills 前**必须停止**，等待用户确认后再继续。
+## upgrade 模式：5 步流程
+
+### 第一步：诊断缺失
 
 ```bash
-GQL_SKILLS=~/repos/gql-skills
-[ ! -d "$GQL_SKILLS" ] && git clone https://github.com/relunctance/gql-skills.git "$GQL_SKILLS"
-cd "$GQL_SKILLS"
+# 检查目标 skill 目录
+ls {target-skill}/
+# 缺失：learns/ / scripts/feedback.py / README.md / README_zh.md
+```
 
-# 添加到对应分类表格
-# ...
+### 第二步：注入 scaffold
+
+| 缺失文件 | 生成内容 |
+|---------|---------|
+| `learns/README.md` | 踩坑沉淀索引（模板见上方第三步） |
+| `learns/self-improvement.md` | 进化机制说明 |
+| `scripts/feedback.py` | 问题积累模块（Python stdlib，零依赖） |
+
+### 第三步：调用 readme-skill 美化 README（中英文）
+
+### 第四步：git commit
+
+```bash
 git add .
-git commit -m "feat: 添加 {name} skill"
+git commit -m "feat: add evolution scaffold (learns/ + feedback.py)"
+git push
+```
+
+### 第五步：联动更新 gql-skills
+
+```bash
+GQL_SKILLS=/home/gql/repos/gql-skills
+cd "$GQL_SKILLS"
+# 添加到对应分类表格
+git add .
+git commit -m "feat: add {name} skill"
 git push origin main
 ```
 
 ---
 
-## 文件结构
+## 危险信号表
 
-```
-{name}/
-├── SKILL.md              # 主文件 ≤600 行，核心流程 + references 索引
-├── README.md             # 入口文档（必须美化）
-├── README_ZH.md         # 中文版入口文档（与 README.md 顶部互相引用）
-├── AGENTS.md             # OpenClaw / Hermes 入口
-├── CLAUDE.md             # Claude Code 入口
-├── CODEX.md              # Codex 入口
-├── CURSOR.md             # Cursor 入口
-├── WINDSURF.md           # Windsurf 入口
-├── learns/               # 踩坑沉淀 + 自我进化问题池
-│   ├── README.md         # 踩坑记录索引
-│   ├── self-improvement.md  # 进化机制说明（供 evolution-skill 扫描）
-│   ├── layout-problems.md   # 布局问题积累
-│   └── visual-problems.md   # 视觉问题积累
-├── scripts/
-│   └── feedback.py       # 通用问题积累模块
-└── references/           # 详细文档（原子化，一个文件一个主题）
-    └── README.md
-```
+出现以下症状说明正在犯错误：
 
-## 设计原则
-
-| 该用代码 | 该用 SOP / LLM |
-|---------|----------------|
-| 精确计算（时间戳、diff 百分比） | 决策判断（歧义、优先级） |
-| 文件 I/O（确定性读写） | 文本处理（格式化、提取） |
-| 精确序列化（JSON 结构） | 工作流编排（SOP 章节） |
-
-**操作顺序**：
-1. 先问「能否用 SOP + LLM 解决？」
-2. 再问「最小化代码方案是什么？」
-3. 最后再动手写代码
-
-## 约束
-
-1. 单一改动 < 150 行新增代码
-2. 流程/协议/格式定义 → 放 SKILL.md（SOP 章节）
-3. 精确计算/文件 IO → 放 scripts/
-4. **SKILL.md 尽可能小**，详细内容拆分到 references/
-
-## GitHub Token
-
-```bash
-TOKEN=$(grep "oauth_token:" ~/.config/gh/hosts.yml | head -1 | awk '{print $2}')
-curl -s -H "Authorization: token $TOKEN" https://api.github.com/user | jq .login
-```
-
-## 踩坑沉淀
-
-> 踩坑记录按主题拆分到 `references/` 目录，持续更新。
-
-### references/ 索引
-## references/ 索引
-
-| 文件 | 内容 |
-|------|------|
-| [references/create-flow.md](references/create-flow.md) | create 模式完整流程（第四步半~第九步 + README 模板） |
-| [references/upgrade-mode.md](references/upgrade-mode.md) | upgrade 模式 SOP + feedback.py 模板 |
-| [references/README.md](references/README.md) | 详细文档索引（learns/ 和 references/ 自动生成说明） |
+| 症状 | 根因 | 正确做法 |
+|------|------|----------|
+| `ln: 无法创建符号链接 ... 没有那个文件或目录` | `mkdir -p "$SKILLS_DIR"` 只创建了父目录，没创建 skill 子目录 | 直接创建完整路径 `mkdir -p "$TARGET_DIR"` |
+| `hermes install` 超时后脚本直接退出 | `set -e` 遇上超时直接 exit，fallback 从未执行 | 用 HERMES_OK 标志控制 fallback，不依赖 set -e |
+| `curl 404` 一键安装失败 | curl/pip 命令指向 `main` 分支，实际是 `master` | 发布前验证 `git branch -a` 确认分支名 |
+| install.sh 语法检查通过但实际运行失败 | 只做了 `bash -n`，未实际执行 | 必须 `bash install.sh` 实际运行验证 |
+| SKILL.md 行数 > 600 行 | 详细内容没拆分到 references/ | 重构 SKILL.md，将详情拆分到 references/ |
 
 ---
 
-## 踩坑沉淀
-
-> 踩坑记录按主题拆分到 `references/` 目录，持续更新。
-
-| 文件 | 内容 |
-|------|------|
-| [references/create-flow.md](references/create-flow.md) | 完整创建流程 + README 模板 |
-| [references/upgrade-mode.md](references/upgrade-mode.md) | 升级模式 SOP |
-
----
-
-## 核心流程
-
-> 详细信息拆分到 [references/create-flow.md](references/create-flow.md)。
-
-| 步骤 | 内容 |
-|------|------|
-| 第三步半 | 创建 learns/ + references/ + self-improvement.md |
-| 第三步半续 | 创建 scripts/feedback.py |
-| 第四步 | 生成平台入口文件（AGENTS.md / CLAUDE.md 等） |
-| 第四步半 | 生成 README.md + README_zh.md（含模板） |
-| 第五步 | 调用 readme-skill 美化 README（中英文） |
-| 第六步 | git commit |
-| 第七步 | 创建 GitHub 仓库 |
-| 第八步 | git push |
-| 第九步 | 联动更新 gql-skills |
-
----
-
-
-## 文件结构
-
-```
-{name}/
-├── SKILL.md           # 主入口
-├── README.md          # English
-├── README_zh.md       # 中文
-├── scripts/           # （如有代码）
-└── learns/           # 自我进化
-```
-
-## 安装后验证
-
-- [ ] Skill 加载成功
-- [ ] 触发词生效
-- [ ] 基础功能验证通过
-
-## 欢迎贡献
-
-欢迎提交 Issue 和 PR！
-
-## 许可证
-
-MIT
-EOFZHSELF
-```
-
-> ⚠️ **中英文 README 强制规则**：
-> - 顶部第一行必须互相引用：`**[English](README.md) · [中文](README_zh.md)**`
-> - 两个文件都必须有 `---` frontmatter（`search: false`）
-> - 生成后立即调用 readme-skill 美化，不要手动编辑
-
-### 第五步：README 美化（中英文）
-
-> 🔴 **强制步骤**：必须对 README.md 和 README_zh.md 都调用 readme-skill 美化
-
-```bash
-# 检查 readme-skill 是否安装，没有则自动安装
-if ! hermes skills list 2>/dev/null | grep -q "readme-skill"; then
-  echo "readme-skill not found, installing..."
-  hermes skills install https://github.com/relunctance/readme-skill
-fi
-
-# 加载 readme-skill 并美化 README.md
-hermes skills run readme-skill --path ./README.md
-
-# 加载 readme-skill 并美化 README_zh.md
-hermes skills run readme-skill --path ./README_zh.md
-```
-
-> ⚠️ **readme-skill 美化标准**：
-> - 必须包含：License、Version、Platforms、Category 徽章
-> - 必须包含：中英文互相引用（顶部第一行）
-> - 必须包含：触发条件、安装、核心功能章节
-> - 必须包含：安装后验证 checklist（`- [ ]` 格式）
-> - 禁止在 README 中写"Known Pitfalls"（放 learns/ 或 CONTRIBUTING.md）
-
-### 第六步：提交
-
-```bash
-git add .
-git commit -m "feat: initial {name} skill"
-```
-
-> 🔴 **CHECKPOINT · 🛑 STOP**：创建 GitHub 仓库前**必须停止**，等待用户确认后再继续。
-
-### 第七步：创建 GitHub 仓库
-
-```bash
-# About 信息 = description 字段
-gh repo create {name} \
-  --description "{description}" \
-  --public \
-  --source=. \
-  --push
-```
-
-> ⚠️ **About 信息（description）必须填写**，否则 GitHub 显示"No description"影响可发现性。
-
-### 第八步：推送
-
-```bash
-git branch -M main
-git remote add origin https://github.com/{author}/{name}.git
-git push -u origin main
-```
-
-### 第九步：联动更新 gql-skills
-
-> 🔴 **CHECKPOINT · 🛑 STOP**：更新 gql-skills 前**必须停止**，等待用户确认后再继续。
-
-```bash
-GQL_SKILLS=~/repos/gql-skills
-[ ! -d "$GQL_SKILLS" ] && git clone https://github.com/relunctance/gql-skills.git "$GQL_SKILLS"
-cd "$GQL_SKILLS"
-
-# 添加到对应分类表格
-# ...
-git add .
-git commit -m "feat: 添加 {name} skill"
-git push origin main
-```
-
----
-
-## 文件结构
-
-```
-{name}/
-├── SKILL.md              # 主文件 ≤600 行，核心流程 + references 索引
-├── README.md             # 入口文档（必须美化）
-├── README_ZH.md         # 中文版入口文档（与 README.md 顶部互相引用）
-├── AGENTS.md             # OpenClaw / Hermes 入口
-├── CLAUDE.md             # Claude Code 入口
-├── CODEX.md              # Codex 入口
-├── CURSOR.md             # Cursor 入口
-├── WINDSURF.md           # Windsurf 入口
-├── learns/               # 踩坑沉淀 + 自我进化问题池
-│   ├── README.md         # 踩坑记录索引
-│   ├── self-improvement.md  # 进化机制说明（供 evolution-skill 扫描）
-│   ├── layout-problems.md   # 布局问题积累
-│   └── visual-problems.md   # 视觉问题积累
-├── scripts/
-│   └── feedback.py       # 通用问题积累模块
-└── references/           # 详细文档（原子化，一个文件一个主题）
-    └── README.md
-```
-
-## 设计原则
-
-| 该用代码 | 该用 SOP / LLM |
-|---------|----------------|
-| 精确计算（时间戳、diff 百分比） | 决策判断（歧义、优先级） |
-| 文件 I/O（确定性读写） | 文本处理（格式化、提取） |
-| 精确序列化（JSON 结构） | 工作流编排（SOP 章节） |
-
-**操作顺序**：
-1. 先问「能否用 SOP + LLM 解决？」
-2. 再问「最小化代码方案是什么？」
-3. 最后再动手写代码
-
-## 约束
-
-1. 单一改动 < 150 行新增代码
-2. 流程/协议/格式定义 → 放 SKILL.md（SOP 章节）
-3. 精确计算/文件 IO → 放 scripts/
-4. **SKILL.md 尽可能小**，详细内容拆分到 references/
-
-## GitHub Token
-
-```bash
-TOKEN=$(grep "oauth_token:" ~/.config/gh/hosts.yml | head -1 | awk '{print $2}')
-curl -s -H "Authorization: token $TOKEN" https://api.github.com/user | jq .login
-```
-
-## 踩坑沉淀
-
-> 踩坑记录按主题拆分到 `references/` 目录，持续更新。
-
-### references/ 索引
-
-| 文件 | 内容 |
-|------|------|
-| references/uv-tool-install-wsl-path.md | uv tool install 在 WSL 下的 HOME 陷阱（2026-06-05） |
-
-### skill-created 禁止行为清单
+## 禁止行为清单
 
 | ❌ 禁止 | 原因 | 正确做法 |
 |---------|------|----------|
-| ❌ 跳过信息收集直接创建 | 会导致仓库名/描述不准确 | 必须先收集 name/description/category/author |
-| ❌ 手动 git init 而不用 gql-skills 流程 | 会跳过 GitHub Actions 自动同步 | 用 gql-skills 流程创建 |
-| ❌ 在 WSL 用 `~` 做路径 | `~` 会展开到 Hermes profile home | 用绝对路径 `/home/gql/` |
-| ❌ 用 `git push -f` | 会丢失远程 commit | 禁止 force push |
-| ❌ 先创建后补文档 | 文档应该在创建时生成，不是之后补 | 创建时就生成完整 SKILL.md + README.md |
-| ❌ 创建 skill 不以 `-skill` 结尾 | 违反命名规范 | 强制以 `-skill` 结尾 |
-| ❌ SKILL.md 写得太大 | 违反「尽可能小」原则 | 详细内容拆分到 references/ |
-| ❌ 跳过 README 美化 | README 质量影响 skill 可用性 | 必须调用 readme-skill 美化（中英文都要） |
-| ❌ 跳过 README_zh.md | 影响中文用户 | 必须同时生成中英文 |
-| ❌ 不写 BDD 注释直接写代码 | 违反 BDD+TDD 开发规范 | 先写 BDD 注释，再 TDD 实现 |
-| ❌ 远程分支用 master | 分支命名不规范 | 统一用 main |
-| ❌ GitHub 仓库不填 description | 影响可发现性 | 必须填写 About 信息 |
+| 跳过信息收集直接创建 | 仓库名/描述不准确 | 必须先收集 name/description/category/author |
+| 手动 git init 而不用 gql-skills 流程 | 跳过 GitHub Actions 自动同步 | 用 gql-skills 流程创建 |
+| 在 WSL 用 `~` 做路径 | `~` 展开到 Hermes profile home | 用绝对路径 `/home/gql/` |
+| 用 `git push -f` | 丢失远程 commit | 禁止 force push |
+| 先创建后补文档 | 文档应该在创建时生成，不是之后补 | 创建时就生成完整 SKILL.md + README.md |
+| 创建 skill 不以 `-skill` 结尾 | 违反命名规范 | 强制以 `-skill` 结尾 |
+| 跳过 README 美化 | README 质量影响 skill 可用性 | 必须调用 readme-skill 美化（中英文都要） |
+| 不写 BDD 注释直接写代码 | 违反 BDD+TDD 开发规范 | 先写 BDD 注释，再 TDD 实现 |
+| 远程分支用 master | 分支命名不规范 | 统一用 main |
+
+---
+
+## 安装后验证清单
+
+- [ ] `hermes skills list` 能看到 skill-created
+- [ ] 说"创建一个 skill"能触发本 skill
+- [ ] README.md + README_zh.md 都存在且顶部互相引用
+- [ ] `learns/` 目录已创建
+- [ ] 无 `__pycache__` 等垃圾文件
+
+---
+
+## GitHub Token（备用）
+
+```bash
+TOKEN=$(grep "oauth_token:" ~/.config/gh/hosts.yml | head -1 | awk '{print $2}')
+curl -s -H "Authorization: token $TOKEN" https://api.github.com/user | jq .login
+```
+
+---
+
+## 参考资料
+
+- [references/create-flow.md](references/create-flow.md) — create 模式完整流程（含 README 模板）
+- [references/upgrade-mode.md](references/upgrade-mode.md) — upgrade 模式 SOP + feedback.py 模板
+- [references/README.md](references/README.md) — references/ 详细索引
