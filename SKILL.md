@@ -313,6 +313,82 @@ git push origin main
 
 ---
 
+## BDD + TDD 开发流程（必须遵守）
+
+### 判断标准
+
+| 该用代码 | 该用 SOP/LLM |
+|----------|-------------|
+| 精确计算（时间戳、diff 百分比） | 决策判断（歧义、优先级） |
+| 确定性文件 IO | 文本处理/格式化 |
+| 幂等脚本（< 50 行） | 工作流编排 |
+
+### 执行顺序
+
+1. **先问**：能否用 SOP + LLM 解决？
+2. **再问**：最小化代码方案是什么？
+3. **最后动手**：写 BDD 注释 → 写测试 → 让测试失败 → 写实现让测试通过
+
+### 步骤级验证清单（小步迭代）
+
+每个子步骤完成后必须验证：
+
+```
+✅ 语法检查（bash -n / python3 -m py_compile）
+✅ 实际运行（bash install.sh / python3 -m pytest）
+✅ 文件结构正确（ls -la）
+✅ 无垃圾文件（__pycache__、*.pyc）
+✅ commit 并推送后，再进入下一步
+```
+
+### commit 时机规则
+
+| 场景 | commit 时机 |
+|------|------------|
+| install.sh 编写完成 | `bash install.sh` 实际运行成功后再 commit |
+| README 美化完成 | readme-skill 美化 + 验证通过后 commit |
+| SKILL.md 重构完成 | 语法检查 + 触发词测试通过后 commit |
+| 新增代码模块 | BDD 测试通过后再 commit |
+
+**禁止**：未验证就 commit；未实际运行就声称"测试通过"。
+
+---
+
+## 步骤级验证 SOP（分步验证）
+
+### create 模式步骤验证
+
+```
+Step 1 收集信息 → CHECKPOINT 停止 → 等待用户确认
+Step 2 初始化仓库 → git init 成功后 commit
+Step 3 生成 SKILL.md → 语法检查通过后 commit
+Step 4 生成 README×2 → 顶部互相引用验证后 commit
+Step 5 readme-skill 美化 → 实际运行美化命令后 commit
+Step 6 安装验证 → bash install.sh 实际运行成功后 commit
+[CHECKPOINT]
+Step 7 GitHub 创建 → gh repo create 成功后 push
+Step 8 gql-skills 联动 → commit + push 后完成
+```
+
+### 验证命令参考
+
+```bash
+# SKILL.md 语法检查
+python3 -c "import yaml; yaml.safe_load(open('SKILL.md'))"
+
+# README 顶部互相引用检查
+grep -c '\[English\](README.md)' README_zh.md && \
+grep -c '\[中文\](README_zh.md)' README.md
+
+# install.sh 实际运行
+bash install.sh 2>&1
+
+# learns/ 目录检查
+ls learns/ && [ -f learns/README.md ]
+```
+
+---
+
 ## 安装后验证清单
 
 - [ ] `hermes skills list` 能看到 skill-created
