@@ -13,119 +13,121 @@ search: false
 [![platforms](https://img.shields.io/badge/platforms-Claude%20Code%20%7C%20Codex%20%7C%20OpenClaw%20%7C%20Hermes%20%7C%20Cursor%20%7C%20Windsurf-blue.svg)](#)
 [![category](https://img.shields.io/badge/category-DevOps-blue.svg)](#)
 
-*Skill 工厂 — 一键创建标准化 GitHub 公开仓库，零成本适配全平台*
+*Skill Factory — One-click creation of standardized GitHub public repositories, zero-cost cross-platform adaptation*
 
 </div>
 
-## 🎯 触发条件
+## 🎯 Triggers
 
-- 创建一个 skill
-- 创建 skill 仓库
-- 新建 skill
-- skill 创建器
-- skill boilerplate
-- **skill-created** ← 必须触发本 skill
-- 创建名叫 skill-created 的 skill
+- Create a skill
+- Create a skill repository
+- New skill
+- Skill creator
+- Skill boilerplate
+- **skill-created** ← Must trigger this skill
+- Create a skill named skill-created
 
-## ✨ 功能特性
+## ✨ Features
 
-- **全平台覆盖**：自动生成 `CLAUDE.md` / `CODEX.md` / `AGENTS.md` / `CURSOR.md` / `WINDSURF.md`
-- **平台插件元数据**：`.claude-plugin/` / `.codex-plugin/` / `.cursor-plugin/` / `.opencode/`
-- **零额外成本**：`platforms` 留空 = 生成全部平台，不强制指定
-- **learns 踩坑沉淀**：每个 skill 自带 `learns/` 目录，持续归档
-- **强制约束**：8 条创建规范保障质量（references/ / README 双语 / BDD+TDD / main 分支等）
+- **Full Platform Coverage**: Auto-generates `CLAUDE.md` / `CODEX.md` / `AGENTS.md` / `CURSOR.md` / `WINDSURF.md`
+- **Platform Plugin Metadata**: `.claude-plugin/` / `.codex-plugin/` / `.cursor-plugin/` / `.opencode/`
+- **Zero Extra Cost**: `platforms` empty = generate all platforms, no forced specification
+- **learns Pitfall Archives**: Each skill comes with `learns/` directory for continuous pitfall documentation
+- **Self-Evolution Ready**: Integrates with [evolve-skill](https://github.com/relunctance/evolve-skill) for automated skill improvement based on learns archives
+- **8 Mandatory Constraints**: Quality guarantees via references/ / bilingual README / BDD+TDD / main branch etc.
 
-## ⚙️ 支持的平台
+## ⚙️ Supported Platforms
 
-| 平台 | 入口文件 | 插件目录 |
-|------|---------|---------|
+| Platform | Entry File | Plugin Directory |
+|----------|------------|-----------------|
 | Claude Code | `CLAUDE.md` | `.claude-plugin/` |
 | Codex | `CODEX.md` | `.codex-plugin/` |
 | OpenClaw / Hermes | `AGENTS.md` | — |
 | Cursor | `CURSOR.md` | `.cursor-plugin/` |
 | Windsurf | `WINDSURF.md` | — |
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
 ```bash
-# 安装
+# Install
 hermes skills install https://github.com/relunctance/skill-created
 
-# 创建新 skill（交互式）
+# Create a new skill (interactive)
 hermes skills run skill-created
 
-# 创建时指定平台
-# platforms: claude,codex（留空=全部平台）
+# Specify platforms during creation
+# platforms: claude,codex (empty=all platforms)
 ```
 
-## 📦 安装
+## 📦 Installation
 
 ```bash
 # Hermes / OpenClaw
 hermes skills install https://github.com/relunctance/skill-created
 ```
 
-## 📁 文件结构
+## 📁 File Structure
 
 ```
 {skill-name}/
-├── SKILL.md              # 所有平台共用（平台无关）
-├── README.md             # 英文文档主页
-├── README_zh.md          # 中文文档主页
-├── AGENTS.md             # OpenClaw / Hermes 入口
-├── CLAUDE.md             # Claude Code 入口
-├── CODEX.md             # Codex 入口
-├── CURSOR.md            # Cursor 入口
-├── WINDSURF.md          # Windsurf 入口
-├── learns/              # 踩坑沉淀（按标签归档）
+├── SKILL.md              # Shared across all platforms (platform-agnostic)
+├── README.md             # English documentation home
+├── README_zh.md          # Chinese documentation home
+├── AGENTS.md             # OpenClaw / Hermes entry
+├── CLAUDE.md             # Claude Code entry
+├── CODEX.md             # Codex entry
+├── CURSOR.md            # Cursor entry
+├── WINDSURF.md          # Windsurf entry
+├── learns/              # Pitfall archives + self-evolution via evolve-skill
 │   └── README.md
-├── .claude-plugin/      # Claude Code 插件元数据
-├── .codex-plugin/       # Codex 插件元数据
-└── .opencode/          # OpenCode 插件目录
+├── .claude-plugin/      # Claude Code plugin metadata
+├── .codex-plugin/       # Codex plugin metadata
+└── .opencode/          # OpenCode plugin directory
 ```
 
-## ✅ 安装后验证
+## ✅ Post-Installation Verification
 
-- [ ] `hermes skills list` 能看到 skill-created
-- [ ] 说"创建一个 skill"能触发本 skill
+- [ ] `hermes skills list` shows skill-created
+- [ ] Saying "create a skill" triggers this skill
 
-## ⚠️ 强制约束
+## ⚠️ Mandatory Constraints
 
-> 完整规范见 [SKILL.md](SKILL.md#创建强制规范)
+> Full specification in [SKILL.md](SKILL.md#创建强制规范)
 
-| # | 约束 | 说明 |
-|---|------|------|
-| 1 | `references/` 目录 | 详细文档拆分到 `references/`，SKILL.md ≤ 600 行 |
-| 2 | 必须美化 README | 中英文都要调用 readme-skill 美化 |
-| 3 | `learns/` 必须创建 | 记录踩坑沉淀 |
-| 4 | 代码优先 Python | 涉及代码的 skill 优先使用 Python |
-| 5 | BDD + TDD 开发 | 先写注释再实现 |
-| 6 | 远程分支 main | 所有新仓库统一 main |
-| 7 | GitHub About 信息 | 创建仓库时必须填写 description |
-| 8 | 触发词 + 仓库名 | 用户说 `skill-created` 必须触发；仓库名也必须是触发词 |
+| # | Constraint | Description |
+|---|------------|-------------|
+| 1 | `references/` directory | Detailed docs split into `references/`, SKILL.md ≤ 600 lines |
+| 2 | README beautification | Both English and Chinese call readme-skill for beautification |
+| 3 | `learns/` must be created | Record pitfall archives |
+| 4 | Python-first | Skills involving code prefer Python |
+| 5 | BDD + TDD development | Write comments first, then implement |
+| 6 | Remote branch main | All new repositories use main |
+| 7 | GitHub About info | Must fill description when creating repository |
+| 8 | Triggers + repo name | User saying `skill-created` must trigger; repo name must also be the trigger |
 
-## 🔗 相关 Skills
+## 🔗 Related Skills
 
-- [readme-skill](https://github.com/relunctance/readme-skill) — README 美化工具（skill-created 的配套工具）
-- [dir-skill](https://github.com/relunctance/dir-skill) — 目录结构标准化
+- [readme-skill](https://github.com/relunctance/readme-skill) — README beautification tool (skill-created's companion)
+- [dir-skill](https://github.com/relunctance/dir-skill) — Directory structure standardization
+- [evolve-skill](https://github.com/relunctance/evolve-skill) — Skill self-evolution engine (uses learns/ archives)
 
-## 🤝 欢迎贡献
+## 🤝 Contributing
 
-欢迎提交 Issue 和 Pull Request！
+Contributions, issues and pull requests are welcome!
 
-**发现 bug？**
-1. 提交 [Issue](https://github.com/relunctance/skill-created/issues)
-2. 描述复现步骤
-3. 附上错误日志
+**Found a bug?**
+1. Submit an [Issue](https://github.com/relunctance/skill-created/issues)
+2. Describe reproduction steps
+3. Attach error logs
 
-**想贡献代码？**
-1. Fork 本仓库
-2. 创建 Feature 分支 (`git checkout -b feature/AmazingFeature`)
-3. 编写 BDD 注释 + TDD 测试
-4. 提交更改 (`git commit -m 'Add AmazingFeature'`)
-5. 推送到分支 (`git push origin feature/AmazingFeature`)
-6. 创建 Pull Request
+**Want to contribute code?**
+1. Fork this repository
+2. Create a Feature branch (`git checkout -b feature/AmazingFeature`)
+3. Write BDD comments + TDD tests
+4. Commit changes (`git commit -m 'Add AmazingFeature'`)
+5. Push to branch (`git push origin feature/AmazingFeature`)
+6. Create a Pull Request
 
-## 📜 许可证
+## 📜 License
 
-MIT — 详见 [LICENSE](LICENSE)
+MIT — see [LICENSE](LICENSE)

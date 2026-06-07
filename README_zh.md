@@ -32,7 +32,7 @@ search: false
 - **全平台覆盖**：自动生成 `CLAUDE.md` / `CODEX.md` / `AGENTS.md` / `CURSOR.md` / `WINDSURF.md`
 - **平台插件元数据**：`.claude-plugin/` / `.codex-plugin/` / `.cursor-plugin/` / `.opencode/`
 - **零额外成本**：`platforms` 留空 = 生成全部平台，不强制指定
-- **learns 踩坑沉淀**：每个 skill 自带 `learns/` 目录，持续归档
+- **learns 踩坑沉淀**：每个 skill 自带 `learns/` 目录，持续归档；可结合 [evolve-skill](https://github.com/relunctance/evolve-skill) 实现基于 learns 的自我进化
 - **强制约束**：8 条创建规范保障质量（references/ / README 双语 / BDD+TDD / main 分支等）
 
 ## ⚙️ 支持的平台
@@ -74,7 +74,7 @@ hermes skills install https://github.com/relunctance/skill-created
 ├── CODEX.md             # Codex 入口
 ├── CURSOR.md            # Cursor 入口
 ├── WINDSURF.md          # Windsurf 入口
-├── learns/              # 踩坑沉淀（按标签归档）
+├── learns/              # 踩坑沉淀 + evolve-skill 自我进化数据
 │   └── README.md
 ├── .claude-plugin/     # Claude Code 插件元数据
 ├── .codex-plugin/      # Codex 插件元数据
@@ -105,6 +105,7 @@ hermes skills install https://github.com/relunctance/skill-created
 
 - [readme-skill](https://github.com/relunctance/readme-skill) — README 美化工具（skill-created 的配套工具）
 - [dir-skill](https://github.com/relunctance/dir-skill) — 目录结构标准化
+- [evolve-skill](https://github.com/relunctance/evolve-skill) — Skill 自我进化引擎（基于 learns/ 驱动）
 
 ## 🤝 欢迎贡献
 
