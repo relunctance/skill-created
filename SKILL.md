@@ -14,7 +14,7 @@ triggers:
 category: devops
 author: relunctance
 created: 2026-05-08
-updated: 2026-06-07
+updated: 2026-06-10
 tags:
   - skill
   - skill-created
@@ -115,8 +115,12 @@ git push
 
 > ⚠️ **创建强制规范**（每次创建 skill 必须遵守）：
 > 1. **使用 `references/` 目录**：详细文档拆分到 `references/`，主文件 SKILL.md 尽可能小（≤600行）
-> 2. **必须美化 README**：创建完成后调用 readme-skill 美化 README
+> 2. **必须美化 README**：创建完成后调用 readme-skill 美化 README（中英文都要）
 > 3. **learns/ 必须创建**：记录踩坑沉淀
+> 4. **代码优先 Python**：涉及代码的 skill 优先使用 Python
+> 5. **BDD + TDD 开发**：写代码必须先写 BDD 注释，再 TDD 实现
+> 6. **远程分支 main**：所有新仓库 `git branch -M main`
+> 7. **GitHub About 信息**：创建仓库时必须填写 description
 
 > **platforms 默认值**：留空则生成全部平台（claude / codex / openclaw / hermes / cursor / windsurf）
 
@@ -459,16 +463,169 @@ EOF
 done
 ```
 
-### 第五步：README 美化
+### 第四步半：生成 README.md 和 README_zh.md
 
-> 🔴 **强制步骤**：创建完 SKILL.md 后必须调用 readme-skill 美化 README
+> 🔴 **强制步骤**：每个 skill 必须同时有 README.md（英文）和 README_zh.md（中文），顶部互相引用
 
 ```bash
-# 加载 readme-skill 并美化 README
-# 参照 readme-skill 的规范检查并更新 README
-# 必须包含：License、Version、Platforms、Category 徽章
-# 必须包含：触发条件、安装、核心功能章节
+# README.md（英文）
+cat > README.md << 'EOFREADME'
+---
+search: false
+---
+
+<div align="center">
+
+# {emoji} {name}
+
+**[English](README.md) · [中文](README_zh.md)**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![version](https://img.shields.io/badge/version-1.0.0-green.svg)](#)
+[![platforms](https://img.shields.io/badge/platforms-Hermes%20Agent-4B8FBA.svg)](#)
+[![category](https://img.shields.io/badge/category-{category}-blue.svg)](#)
+[![Python](https://img.shields.io/badge/Python-3.8+-3776AB.svg)](https://www.python.org/)
+
+*{description}*
+
+</div>
+
+## What It Does
+
+<!-- LLM 补充 -->
+
+## Features
+
+<!-- LLM 补充 -->
+
+## Quick Start
+
+```bash
+# 安装
+hermes skills install https://github.com/{author}/{name}
+
+# 使用
+hermes skills run {name}
 ```
+
+## File Structure
+
+```
+{name}/
+├── SKILL.md           # Main entry
+├── README.md          # English
+├── README_zh.md       # Chinese
+├── scripts/           # (if applicable)
+└── learns/           # Self-evolution
+```
+
+## Installation Verification
+
+- [ ] Skill loaded successfully
+- [ ] Trigger word works
+- [ ] Basic function verified
+
+## Contributing
+
+Contributions welcome! Please submit Issues and PRs.
+
+## License
+
+MIT
+EOFREADME
+
+# README_zh.md（中文）
+cat > README_zh.md << 'EOFZHSELF'
+---
+search: false
+---
+
+<div align="center">
+
+# {emoji} {name}
+
+**[English](README.md) · [中文](README_zh.md)**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![version](https://img.shields.io/badge/version-1.0.0-green.svg)](#)
+[![platforms](https://img.shields.io/badge/platforms-Hermes%20Agent-4B8FBA.svg)](#)
+[![category](https://img.shields.io/badge/category-{category}-blue.svg)](#)
+[![Python](https://img.shields.io/badge/Python-3.8+-3776AB.svg)](https://www.python.org/)
+
+*{description}*
+
+</div>
+
+## 核心能力
+
+<!-- LLM 补充 -->
+
+## 快速开始
+
+```bash
+# 安装
+hermes skills install https://github.com/{author}/{name}
+
+# 使用
+hermes skills run {name}
+```
+
+## 文件结构
+
+```
+{name}/
+├── SKILL.md           # 主入口
+├── README.md          # English
+├── README_zh.md       # 中文
+├── scripts/           # （如有代码）
+└── learns/           # 自我进化
+```
+
+## 安装后验证
+
+- [ ] Skill 加载成功
+- [ ] 触发词生效
+- [ ] 基础功能验证通过
+
+## 欢迎贡献
+
+欢迎提交 Issue 和 PR！
+
+## 许可证
+
+MIT
+EOFZHSELF
+```
+
+> ⚠️ **中英文 README 强制规则**：
+> - 顶部第一行必须互相引用：`**[English](README.md) · [中文](README_zh.md)**`
+> - 两个文件都必须有 `---` frontmatter（`search: false`）
+> - 生成后立即调用 readme-skill 美化，不要手动编辑
+
+### 第五步：README 美化（中英文）
+
+> 🔴 **强制步骤**：必须对 README.md 和 README_zh.md 都调用 readme-skill 美化
+
+```bash
+# 检查 readme-skill 是否安装，没有则自动安装
+if ! hermes skills list 2>/dev/null | grep -q "readme-skill"; then
+  echo "readme-skill not found, installing..."
+  hermes skills install https://github.com/relunctance/readme-skill
+fi
+
+# 加载 readme-skill 并美化 README.md
+hermes skills run readme-skill --path ./README.md
+
+# 加载 readme-skill 并美化 README_zh.md
+hermes skills run readme-skill --path ./README_zh.md
+```
+
+> ⚠️ **readme-skill 美化标准**：
+> - 必须包含：License、Version、Platforms、Category 徽章
+> - 必须包含：中英文互相引用（顶部第一行）
+> - 必须包含：触发条件、安装、核心功能章节
+> - 必须包含：安装后验证 checklist（`- [ ]` 格式）
+> - 禁止在 README 中写"Known Pitfalls"（放 learns/ 或 CONTRIBUTING.md）
 
 ### 第六步：提交
 
@@ -482,10 +639,15 @@ git commit -m "feat: initial {name} skill"
 ### 第七步：创建 GitHub 仓库
 
 ```bash
-curl -s -X POST https://api.github.com/user/repos \
-  -H "Authorization: token $TOKEN" \
-  -d "{\"name\":\"{name}\",\"description\":\"{description}\",\"private\":false}"
+# About 信息 = description 字段
+gh repo create {name} \
+  --description "{description}" \
+  --public \
+  --source=. \
+  --push
 ```
+
+> ⚠️ **About 信息（description）必须填写**，否则 GitHub 显示"No description"影响可发现性。
 
 ### 第八步：推送
 
@@ -584,4 +746,8 @@ curl -s -H "Authorization: token $TOKEN" https://api.github.com/user | jq .login
 | ❌ 先创建后补文档 | 文档应该在创建时生成，不是之后补 | 创建时就生成完整 SKILL.md + README.md |
 | ❌ 创建 skill 不以 `-skill` 结尾 | 违反命名规范 | 强制以 `-skill` 结尾 |
 | ❌ SKILL.md 写得太大 | 违反「尽可能小」原则 | 详细内容拆分到 references/ |
-| ❌ 跳过 README 美化 | README 质量影响 skill 可用性 | 必须调用 readme-skill 美化 |
+| ❌ 跳过 README 美化 | README 质量影响 skill 可用性 | 必须调用 readme-skill 美化（中英文都要） |
+| ❌ 跳过 README_zh.md | 影响中文用户 | 必须同时生成中英文 |
+| ❌ 不写 BDD 注释直接写代码 | 违反 BDD+TDD 开发规范 | 先写 BDD 注释，再 TDD 实现 |
+| ❌ 远程分支用 master | 分支命名不规范 | 统一用 main |
+| ❌ GitHub 仓库不填 description | 影响可发现性 | 必须填写 About 信息 |
