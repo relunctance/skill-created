@@ -9,9 +9,10 @@ search: false
 **[English](README.md) · [中文](README_zh.md)**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![version](https://img.shields.io/badge/version-1.0.0-green.svg)](#)
+[![version](https://img.shields.io/badge/version-1.1.0-green.svg)](#)
 [![platforms](https://img.shields.io/badge/platforms-Claude%20Code%20%7C%20Codex%20%7C%20OpenClaw%20%7C%20Hermes%20%7C%20Cursor%20%7C%20Windsurf-blue.svg)](#)
 [![category](https://img.shields.io/badge/category-DevOps-blue.svg)](#)
+[![stars](https://img.shields.io/github/stars/relunctance/skill-created?style=flat&label=Stars)](https://github.com/relunctance/skill-created/stargazers)
 
 *Skill 工厂 — 一键创建标准化 GitHub 公开仓库，零成本适配全平台*
 
@@ -48,58 +49,67 @@ search: false
 ## 🚀 快速开始
 
 ```bash
-# 安装
-hermes skills install https://github.com/relunctance/skill-created
+# 一键安装（推荐）
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/relunctance/skill-created/main/install.sh)"
 
 # 创建新 skill（交互式）
 hermes skills run skill-created
+
+# 指定平台（留空=全部5平台）
+# platforms: claude,codex
 ```
 
-## 📦 安装
+## 📦 依赖 & 安装方式
+
+### 依赖
+
+| 依赖 | 说明 | 必选 |
+|------|------|------|
+| `hermes` CLI | Hermes Agent 命令行工具 | ✅ |
+| `curl` | 下载安装脚本 | ✅ |
+| `gh` CLI | GitHub 仓库创建（Step 8） | ❌ |
+| `python3` | YAML frontmatter 验证 | ❌ |
+
+### 安装方式
 
 ```bash
-# Hermes / OpenClaw
+# 方式一：一键安装（推荐）
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/relunctance/skill-created/main/install.sh)"
+
+# 方式二：Hermes CLI
 hermes skills install https://github.com/relunctance/skill-created
-```
 
-## 📁 文件结构
-
-```
-{skill-name}/
-├── SKILL.md              # 所有平台共用（平台无关）
-├── README.md             # 英文文档主页
-├── README_zh.md         # 中文文档主页
-├── AGENTS.md            # OpenClaw / Hermes 入口
-├── CLAUDE.md            # Claude Code 入口
-├── CODEX.md             # Codex 入口
-├── CURSOR.md            # Cursor 入口
-├── WINDSURF.md          # Windsurf 入口
-├── learns/              # 踩坑沉淀 + evolve-skill 自我进化数据
-│   └── README.md
-├── .claude-plugin/     # Claude Code 插件元数据
-├── .codex-plugin/      # Codex 插件元数据
-└── .opencode/          # OpenCode 插件目录
+# 方式三：手动安装
+git clone https://github.com/relunctance/skill-created.git \
+  ~/.hermes/profiles/baijie/skills/skill-created
 ```
 
 ## ✅ 安装后验证
 
 - [ ] `hermes skills list` 能看到 skill-created
 - [ ] 说"创建一个 skill"能触发本 skill
+- [ ] `bash install.sh` 运行无报错
+- [ ] 新 skill 中 `learns/` 目录已创建
+- [ ] 无 `__pycache__` 或 `*.pyc` 文件
 
 ## ⚠️ 强制约束
 
-> 完整规范见 [SKILL.md](SKILL.md#创建强制规范)
+> 完整规范见 [SKILL.md](SKILL.md#约束表)
 
 | # | 约束 | 说明 |
 |---|------|------|
 | 1 | `references/` 目录 | 详细文档拆分到 `references/`，SKILL.md ≤ 600 行 |
-| 2 | 必须美化 README | 中英文都要调用 readme-skill 美化 |
-| 3 | `learns/` 必须创建 | 记录踩坑沉淀 |
-| 4 | 代码优先 Python | 涉及代码的 skill 优先使用 Python |
+| 2 | 中英双语 README | README.md（英文）+ README_zh.md（中文），顶部互相引用 |
+| 3 | 必须美化 README | 中英文都要调用 readme-skill 美化 |
+| 4 | `learns/` 必须创建 | 记录踩坑沉淀 |
 | 5 | BDD + TDD 开发 | 先写注释再实现 |
 | 6 | 远程分支 main | 所有新仓库统一 main |
 | 7 | GitHub About 信息 | 创建仓库时必须填写 description |
-| 8 | 触发词 + 仓库名 | 用户说 `skill-created` 必须触发；仓库名也必须是触发词 |
+| 8 | 触发词 = 仓库名 | 仓库名必须与触发词一致 |
+| 9 | platforms 留空 = 全平台 | 默认生成全部 5 个平台入口 |
+| 10 | 每步 commit 后再继续 | 小步迭代，每步验证通过后立即 commit |
+| 11 | 必须有 install.sh | README 必须含 `curl ... | bash` 一键安装 |
+| 12 | 欢迎贡献章节 | README 必须包含 CONTRIBUTING 说明 |
 
 ## 🔗 相关 Skills
 
