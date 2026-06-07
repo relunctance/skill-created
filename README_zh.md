@@ -53,9 +53,6 @@ hermes skills install https://github.com/relunctance/skill-created
 
 # 创建新 skill（交互式）
 hermes skills run skill-created
-
-# 创建时指定平台
-# platforms: claude,codex（留空=全部平台）
 ```
 
 ## 📦 安装
@@ -71,16 +68,16 @@ hermes skills install https://github.com/relunctance/skill-created
 {skill-name}/
 ├── SKILL.md              # 所有平台共用（平台无关）
 ├── README.md             # 英文文档主页
-├── README_zh.md          # 中文文档主页
-├── AGENTS.md             # OpenClaw / Hermes 入口
-├── CLAUDE.md             # Claude Code 入口
+├── README_zh.md         # 中文文档主页
+├── AGENTS.md            # OpenClaw / Hermes 入口
+├── CLAUDE.md            # Claude Code 入口
 ├── CODEX.md             # Codex 入口
 ├── CURSOR.md            # Cursor 入口
 ├── WINDSURF.md          # Windsurf 入口
 ├── learns/              # 踩坑沉淀（按标签归档）
 │   └── README.md
-├── .claude-plugin/      # Claude Code 插件元数据
-├── .codex-plugin/       # Codex 插件元数据
+├── .claude-plugin/     # Claude Code 插件元数据
+├── .codex-plugin/      # Codex 插件元数据
 └── .opencode/          # OpenCode 插件目录
 ```
 
