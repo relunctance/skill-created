@@ -8,10 +8,13 @@ triggers:
   - skill 创建器
   - skill boilerplate
   - 创建多平台 skill
+  - skill-created --upgrade
+  - 为某个 skill 添加 learns/
+  - 升级已有 skill 的进化机制
 category: devops
 author: relunctance
 created: 2026-05-08
-updated: 2026-05-30
+updated: 2026-06-07
 tags:
   - skill
   - skill-created
@@ -30,6 +33,8 @@ tags:
 
 ## 触发条件
 
+### create 模式
+
 用户说：
 - `创建一个 skill`
 - `创建 skill 仓库`
@@ -37,6 +42,59 @@ tags:
 - `skill 创建器`
 - `skill boilerplate`
 - 或任何需要新建 skill 的场景
+
+### upgrade 模式
+
+用户说：
+- `skill-created --upgrade <target-skill>`
+- `为某个 skill 添加 learns/`
+- `升级已有 skill 的进化机制`
+
+**Step 1：检查缺失文件**
+```
+检查 target-skill 目录下：
+├── learns/
+│   ├── README.md
+│   ├── self-improvement.md
+│   └── *-problems.md（可选，初次为空）
+├── scripts/
+│   └── feedback.py
+```
+
+**Step 2：注入 scaffold（缺少什么补什么）**
+
+生成并写入 `learns/README.md`：
+```markdown
+# {name} 踩坑沉淀
+
+> 开发/维护过程中遇到的所有坑，按标签归档。
+
+## 🏷️ 按标签索引
+
+<!-- 初次创建时为空，后续按需追加 -->
+```
+
+生成并写入 `learns/self-improvement.md`：
+```markdown
+# 自我进化机制
+
+> 本 skill 内置自我进化闭环，持续积累经验并自动优化。
+...
+```
+
+生成并写入 `scripts/feedback.py`（纯 Python stdlib，零依赖）。
+
+**Step 3：运行 readme-skill 美化**（必须）
+
+**Step 4：commit + push**
+
+```bash
+git add .
+git commit -m "feat: add evolution scaffold (learns/ + feedback.py)"
+git push
+```
+
+**Step 5：更新 gql-skills**（关联 issue）
 
 ## 使用方法
 
