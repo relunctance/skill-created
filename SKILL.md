@@ -143,7 +143,55 @@ git config user.name "maomao"
 
 生成 `SKILL.md`（含 frontmatter + 核心流程 + references 索引）。
 
+**SKILL.md 骨架**（直接复制使用）：
+
+```markdown
+---
+name: {name}
+description: {description}
+triggers:
+  - {trigger1}
+  - {trigger2}
+category: {category}
+author: {author}
+created: {YYYY-MM-DD}
+updated: {YYYY-MM-DD}
+platforms: all
+tags:
+  - {name}
+---
+
+# {name}
+
+> {description}
+
+## 触发条件
+
+当需要以下操作时使用：
+- {trigger1}
+- {trigger2}
+
+## 核心流程
+
+<!-- 概要流程，详细内容拆分到 references/ -->
+
+## references/ 索引
+
+|| 文件 | 内容 |
+|------|------|
+|| [references/create-flow.md](references/create-flow.md) | 完整流程 + README 模板 |
+
+---
+
+## 约束
+
+1. 单一改动 < 150 行新增代码
+2. 流程/协议/格式定义 → 放 SKILL.md
+3. 精确计算/文件 IO → 放 scripts/
+```
+
 生成 `learns/README.md`：
+
 ```markdown
 # {name} 踩坑沉淀
 
@@ -153,11 +201,14 @@ git config user.name "maomao"
 ```
 
 生成 `references/README.md`：
+
 ```markdown
 # references/
 
 ## 📚 文档索引
 ```
+
+**✅ 验证**：语法检查 + 文件存在 → commit → 再继续
 
 ### 第四步：生成 README.md + README_zh.md
 
