@@ -284,6 +284,19 @@ git push origin main
 
 ---
 
+## 禁忌操作表
+
+| 禁忌 | 后果 | 正确做法 |
+|------|------|----------|
+| 在 WSL 用 `~` 做路径 | `~` 展开为 Hermes profile home，导致仓库创建在错误位置 | 用绝对路径 `/home/gql/repos/` |
+| `set -e` + 超时命令 | 超时直接退出，fallback 从未执行 | 用 HERMES_OK 标志控制 fallback |
+| curl 指向 `main` 分支 | 实际分支是 `master` → 404 | 发布前确认 `git branch -a` |
+| `bash -n` 替代实际运行 | 语法检查通过但运行失败 | 必须 `bash install.sh` 实际执行 |
+| 先创建后补文档 | 文档半成品，质量无保障 | 创建时就生成完整文件，每步验证 commit |
+| SKILL.md 写太大（>600行） | 可读性差，违反原子化原则 | 详细内容拆分到 references/ |
+
+---
+
 ## 禁止行为清单
 
 | ❌ 禁止 | 原因 | 正确做法 |
